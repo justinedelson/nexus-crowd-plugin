@@ -34,6 +34,15 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
     private SecurityServerClient crowdClient;
 
     /**
+     * If true, Crowd groups will be used to populate the role list. If false,
+     * Crowd roles will be used.
+     * 
+     * @plexus.configuration
+     */
+
+    private boolean useGroups;
+
+    /**
      * @plexus.configuration
      */
     private Properties crowdProperties;
@@ -46,16 +55,7 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
     public List<String> getRoles(String username) {
         getLogger().info("Looking up role list for username: " + username);
 
-        List<String> roles;
-        try {
-            roles = Arrays.asList(crowdClient.findRoleMemberships(username));
-        } catch (RemoteException e) {
-            throw new AuthorizationException("Unable to connect to Crowd.", e);
-        } catch (InvalidAuthorizationTokenException e) {
-            throw new AuthorizationException("Unable to connect to Crowd.", e);
-        } catch (ObjectNotFoundException e) {
-            throw new MissingAccountException("User '" + username + "' cannot be retrieved.", e);
-        }
+        List<String> roles = getRoleList(username);
 
         if (rolePrefix != null) {
             for (int i = 0; i < roles.size(); i++) {
@@ -69,6 +69,24 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
 
         getLogger().info("Obtained role list: " + roles.toString());
 
+        return roles;
+    }
+
+    private List<String> getRoleList(String username) {
+        List<String> roles;
+        try {
+            if (useGroups) {
+                roles = Arrays.asList(crowdClient.findGroupMemberships(username));
+            } else {
+                roles = Arrays.asList(crowdClient.findRoleMemberships(username));
+            }
+        } catch (RemoteException e) {
+            throw new AuthorizationException("Unable to connect to Crowd.", e);
+        } catch (InvalidAuthorizationTokenException e) {
+            throw new AuthorizationException("Unable to connect to Crowd.", e);
+        } catch (ObjectNotFoundException e) {
+            throw new MissingAccountException("User '" + username + "' cannot be retrieved.", e);
+        }
         return roles;
     }
 
