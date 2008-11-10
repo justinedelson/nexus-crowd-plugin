@@ -3,7 +3,9 @@
         <component>
             <role>org.jsecurity.realm.Realm</role>
             <role-hint>CrowdAuthenticatingRealm</role-hint>
-            <implementation>org.sonatype.nexus.jsecurity.realms.external.ExternalUserAuthenticatingRealm</implementation>
+            <implementation>
+                org.sonatype.nexus.jsecurity.realms.external.ExternalUserAuthenticatingRealm
+            </implementation>
             <description></description>
             <isolated-realm>false</isolated-realm>
             <requirements>
@@ -17,7 +19,9 @@
         <component>
             <role>org.jsecurity.realm.Realm</role>
             <role-hint>NexusCrowdMethodAuthorizingRealm</role-hint>
-            <implementation>org.sonatype.nexus.jsecurity.realms.external.NexusExternalUserMethodAuthorizingRealm</implementation>
+            <implementation>
+                org.sonatype.nexus.jsecurity.realms.external.NexusExternalUserMethodAuthorizingRealm
+            </implementation>
             <description></description>
             <isolated-realm>false</isolated-realm>
             <requirements>
@@ -28,10 +32,12 @@
                 </requirement>
                 <requirement>
                     <role>org.sonatype.jsecurity.realms.tools.ConfigurationManager</role>
+                    <role-hint>resourceMerging</role-hint>
                     <field-name>configuration</field-name>
                 </requirement>
                 <requirement>
                     <role>org.sonatype.nexus.jsecurity.NexusSecurity</role>
+                    <role-hint>default</role-hint>
                     <field-name>security</field-name>
                 </requirement>
             </requirements>
@@ -39,7 +45,9 @@
         <component>
             <role>org.jsecurity.realm.Realm</role>
             <role-hint>NexusCrowdTargetAuthorizingRealm</role-hint>
-            <implementation>org.sonatype.nexus.jsecurity.realms.external.NexusExternalUserTargetAuthorizingRealm</implementation>
+            <implementation>
+                org.sonatype.nexus.jsecurity.realms.external.NexusExternalUserTargetAuthorizingRealm
+            </implementation>
             <description></description>
             <isolated-realm>false</isolated-realm>
             <requirements>
@@ -50,14 +58,17 @@
                 </requirement>
                 <requirement>
                     <role>org.sonatype.jsecurity.realms.tools.ConfigurationManager</role>
+                    <role-hint>resourceMerging</role-hint>
                     <field-name>configuration</field-name>
                 </requirement>
                 <requirement>
                     <role>org.sonatype.nexus.jsecurity.NexusSecurity</role>
+                    <role-hint>default</role-hint>
                     <field-name>security</field-name>
                 </requirement>
                 <requirement>
                     <role>org.sonatype.nexus.Nexus</role>
+                    <role-hint>default</role-hint>
                     <field-name>nexus</field-name>
                 </requirement>
             </requirements>
