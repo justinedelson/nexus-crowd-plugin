@@ -52,6 +52,24 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
      */
     private String rolePrefix;
 
+    public AuthenticationInfo authenticate(UsernamePasswordToken token, String name) {
+        try {
+            crowdClient.authenticatePrincipalSimple(token.getUsername(), new String(token
+                    .getPassword()));
+            return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), name);
+        } catch (RemoteException e) {
+            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+        } catch (InvalidAuthorizationTokenException e) {
+            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+        } catch (ApplicationAccessDeniedException e) {
+            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+        } catch (InvalidAuthenticationException e) {
+            throw new IncorrectCredentialsException(e);
+        } catch (InactiveAccountException e) {
+            throw new DisabledAccountException(e);
+        }
+    }
+
     public List<String> getRoles(String username) {
         getLogger().info("Looking up role list for username: " + username);
 
@@ -72,6 +90,11 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
         return roles;
     }
 
+    public void initialize() throws InitializationException {
+        ClientProperties clientProps = new ClientPropertiesImpl(crowdProperties);
+        crowdClient = new SecurityServerClientImpl(clientProps);
+    }
+
     private List<String> getRoleList(String username) {
         List<String> roles;
         try {
@@ -88,29 +111,6 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
             throw new MissingAccountException("User '" + username + "' cannot be retrieved.", e);
         }
         return roles;
-    }
-
-    public AuthenticationInfo authenticate(UsernamePasswordToken token, String name) {
-        try {
-            crowdClient.authenticatePrincipalSimple(token.getUsername(), new String(token
-                    .getPassword()));
-            return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), name);
-        } catch (RemoteException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthorizationTokenException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (ApplicationAccessDeniedException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthenticationException e) {
-            throw new IncorrectCredentialsException(e);
-        } catch (InactiveAccountException e) {
-            throw new DisabledAccountException(e);
-        }
-    }
-
-    public void initialize() throws InitializationException {
-        ClientProperties clientProps = new ClientPropertiesImpl(crowdProperties);
-        crowdClient = new SecurityServerClientImpl(clientProps);
     }
 
 }
