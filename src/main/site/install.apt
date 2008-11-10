@@ -1,0 +1,43 @@
+
+  [[1]] Unzip the zip file into the nexus install directory.
+
+  [[2]] Add a component definition to conf/plexus.xml. A sample is provided in conf/plexus-sample.xml
+  
++------------------
+<component>
+    <role>org.sonatype.nexus.jsecurity.realms.external.ExternalUserDataService</role>
+    <role-hint>crowd</role-hint>
+    <implementation>org.sonatype.nexus.jsecurity.realms.external.crowd.CrowdUserDataService</implementation>
+    <configuration>
+		<crowdProperties>
+    		<property>
+				<name>application.name</name>
+				<value>nexus</value>
+    		</property>
+    		<property>
+				<name>application.password</name>
+				<value>SECRET</value>
+    		</property>
+    		<property>
+				<name>crowd.server.url</name>
+				<value>http://mycrowd/services/</value>
+    		</property>
+    		<property>
+				<name>session.validationinterval</name>
+				<value>30</value>
+    		</property>
+		</crowdProperties>
+		<rolePrefix>nexus-</rolePrefix>
+    </configuration>
+</component>
++------------------
+
+  [[3]] Edit the security realms in sonatype-work/nexus/conf/nexus.xml to match this:
+  
++------------------
+    <realms>
+      <realm>CrowdAuthenticatingRealm</realm>
+      <realm>NexusCrowdMethodAuthorizingRealm</realm>
+      <realm>NexusCrowdTargetAuthorizingRealm</realm>
+    </realms>
++------------------

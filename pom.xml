@@ -17,9 +17,9 @@
         </developer>
     </developers>
     <scm>
-        <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-external-auth</url>
-        <connection>http://svn.sonatype.org/nexus-plugins/trunk/nexus-external-auth</connection>
-        <developerConnection>https://svn.sonatype.org/nexus-plugins/trunk/nexus-external-auth</developerConnection>
+        <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</url>
+        <connection>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</connection>
+        <developerConnection>https://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</developerConnection>
     </scm>
     <repositories>
         <repository>
@@ -48,6 +48,53 @@
             <groupId>com.atlassian.crowd</groupId>
             <artifactId>crowd-integration-client</artifactId>
             <version>1.5</version>
+            <!-- these exclusions are all provided by nexus -->
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>commons-collections</artifactId>
+                	<groupId>commons-collections</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>activation</artifactId>
+                    <groupId>javax.activation</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>commons-beanutils</artifactId>
+                	<groupId>commons-beanutils</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>commons-codec</artifactId>
+                	<groupId>commons-codec</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>commons-httpclient</artifactId>
+                	<groupId>commons-httpclient</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>ehcache</artifactId>
+                	<groupId>net.sf.ehcache</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>jdom</artifactId>
+                	<groupId>jdom</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>xercesImpl</artifactId>
+                	<groupId>xerces</groupId>
+                </exclusion>
+                <exclusion>
+                	<artifactId>xmlParserAPIs</artifactId>
+                	<groupId>xerces</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -77,6 +124,14 @@
                     <target>1.5</target>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/nexus-plugin.xml</descriptor>
+                    </descriptors>
                 </configuration>
             </plugin>
         </plugins>

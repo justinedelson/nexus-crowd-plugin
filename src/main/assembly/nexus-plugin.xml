@@ -1,0 +1,21 @@
+<assembly>
+    <id>nexus-plugin</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>src/main/assembly</directory>
+            <includes>
+                <include>plexus-sample.xml</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>            
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>
