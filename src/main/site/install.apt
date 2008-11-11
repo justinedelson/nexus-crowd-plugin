@@ -38,11 +38,10 @@
 +------------------
 
   [[4]] By default, the names of Crowd roles (or groups) will be used verbatim. It can be desirable to use
-  a simple prefix-based mapping between Crowd roles and Nexus roles. For example, you might want to have
-  a Crowd role named nexus-admin which maps to the Nexus role admin. To do this, add this configuration:
+  a mapping between Crowd roles and Nexus roles. To do this, provide the mapper's name (hint):
 
 +------------------
-		<rolePrefix>nexus-</rolePrefix>
+		<mapperName>prefix-based</mapperName>
 +------------------
 
   [[5]] As of Nexus 1.1, the anonymous role is locked, so if you've created a custom "anonymous" role, you need to specify that:
