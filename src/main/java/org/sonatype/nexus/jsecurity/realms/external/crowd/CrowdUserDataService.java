@@ -5,9 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Serviceable;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.DisabledAccountException;
@@ -16,7 +19,9 @@ import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.AuthorizationException;
 import org.jsecurity.authz.MissingAccountException;
+import org.sonatype.nexus.jsecurity.realms.external.ExternalRoleMapper;
 import org.sonatype.nexus.jsecurity.realms.external.ExternalUserDataService;
+import org.sonatype.nexus.jsecurity.realms.external.ExternalUserRoleUtils;
 
 import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
 import com.atlassian.crowd.integration.exception.InactiveAccountException;
@@ -29,7 +34,7 @@ import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
 import com.atlassian.crowd.integration.service.soap.client.SecurityServerClientImpl;
 
 public class CrowdUserDataService extends AbstractLogEnabled implements ExternalUserDataService,
-        Initializable {
+        Initializable, Serviceable {
 
     private static final String ANONYMOUS = "anonymous";
 
@@ -48,10 +53,15 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
      */
     private Properties crowdProperties;
 
+    private ServiceLocator locator;
+
     /**
+     * The name of the ExternalRoleMapper that will be used to map external role
+     * names to Nexus role names.
+     * 
      * @plexus.configuration
      */
-    private String rolePrefix;
+    private String mapperName;
 
     /**
      * If true, Crowd groups will be used to populate the role list. If false,
@@ -59,7 +69,6 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
      * 
      * @plexus.configuration
      */
-
     private boolean useGroups;
 
     public AuthenticationInfo authenticate(UsernamePasswordToken token, String name) {
@@ -93,14 +102,14 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
 
             List<String> roles = getRoleList(username);
 
-            if (rolePrefix != null) {
-                for (int i = 0; i < roles.size(); i++) {
-                    String role = roles.get(i);
-                    if (role.startsWith(rolePrefix)) {
-                        role = role.substring(rolePrefix.length());
-                        roles.set(i, role);
-                    }
+            try {
+                if (locator.hasComponent(ExternalRoleMapper.ROLE, mapperName)) {
+                    ExternalRoleMapper mapper = (ExternalRoleMapper) locator.lookup(
+                            ExternalRoleMapper.ROLE, mapperName);
+                    roles = ExternalUserRoleUtils.mapRoles(roles, mapper);
                 }
+            } catch (ComponentLookupException e) {
+                getLogger().error("Unable to map role names.", e);
             }
 
             getLogger().info("Obtained role list: " + roles.toString());
@@ -112,6 +121,10 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
     public void initialize() throws InitializationException {
         ClientProperties clientProps = new ClientPropertiesImpl(crowdProperties);
         crowdClient = new SecurityServerClientImpl(clientProps);
+    }
+
+    public void service(ServiceLocator locator) {
+        this.locator = locator;
     }
 
     private List<String> getRoleList(String username) {
