@@ -103,7 +103,7 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
             List<String> roles = getRoleList(username);
 
             try {
-                if (locator.hasComponent(ExternalRoleMapper.ROLE, mapperName)) {
+                if (mapperName != null && locator.hasComponent(ExternalRoleMapper.ROLE, mapperName)) {
                     ExternalRoleMapper mapper = (ExternalRoleMapper) locator.lookup(
                             ExternalRoleMapper.ROLE, mapperName);
                     roles = ExternalUserRoleUtils.mapRoles(roles, mapper);
