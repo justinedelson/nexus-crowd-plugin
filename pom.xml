@@ -36,7 +36,7 @@
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-app</artifactId>
-            <version>1.1.0</version>
+            <version>${nexus.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -128,6 +128,14 @@
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>    
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <descriptors>
                         <descriptor>src/main/assembly/nexus-plugin.xml</descriptor>
@@ -136,4 +144,7 @@
             </plugin>
         </plugins>
     </build>
+    <properties>
+    	<nexus.version>1.1.0</nexus.version>
+	</properties>
 </project>
