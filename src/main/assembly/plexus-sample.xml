@@ -23,6 +23,5 @@
 				<value>30</value>
     		</property>
 		</crowdProperties>
-		<rolePrefix>nexus-</rolePrefix>
     </configuration>
 </component>

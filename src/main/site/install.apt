@@ -1,5 +1,5 @@
 
-  [[1]] Unzip the zip file into the nexus install directory.
+  [[1]] Unzip the zip file into the nexus root directory. This will add all the necessary JAR files to runtime/apps/nexus/lib.
 
   [[2]] Add a component definition to conf/plexus.xml. A sample is provided in conf/plexus-sample.xml
   
@@ -27,12 +27,31 @@
 				<value>30</value>
     		</property>
 		</crowdProperties>
-		<rolePrefix>nexus-</rolePrefix>
     </configuration>
 </component>
 +------------------
 
-  [[3]] Edit the security realms in sonatype-work/nexus/conf/nexus.xml to match this:
+  [[3]] By default, Crowd roles will be used. If you want to use Crowd groups instead add this configuration:
+  
++------------------
+       <useGroups>true</useGroups>
++------------------
+
+  [[4]] By default, the names of Crowd roles (or groups) will be used verbatim. It can be desirable to use
+  a simple prefix-based mapping between Crowd roles and Nexus roles. For example, you might want to have
+  a Crowd role named nexus-admin which maps to the Nexus role admin. To do this, add this configuration:
+
++------------------
+		<rolePrefix>nexus-</rolePrefix>
++------------------
+
+  [[5]] As of Nexus 1.1, the anonymous role is locked, so if you've created a custom "anonymous" role, you need to specify that:
+  
++------------------
+       <anonymousRole>custom-anonymous</anonymousRole>
++------------------
+
+  [[6]] Edit the security realms in sonatype-work/nexus/conf/nexus.xml to match this:
   
 +------------------
     <realms>

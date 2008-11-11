@@ -2,17 +2,56 @@ package org.sonatype.nexus.jsecurity.realms.external.crowd;
 
 import static org.easymock.EasyMock.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.jsecurity.authc.IncorrectCredentialsException;
+import org.jsecurity.authc.SimpleAuthenticationInfo;
+import org.jsecurity.authc.UsernamePasswordToken;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
 import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
 import com.mtvi.plateng.testing.ReflectionHelper;
 
 public class CrowdUserDataServiceTest {
+
+    @Test
+    public void checkAnonymousAutc() throws Exception {
+        CrowdUserDataService service = new CrowdUserDataService();
+        UsernamePasswordToken token = new UsernamePasswordToken("anonymous", "anonymous");
+        SimpleAuthenticationInfo authInfo = (SimpleAuthenticationInfo) service.authenticate(token,
+                "test");
+        Assert.assertEquals("anonymous", authInfo.getPrincipals().oneByType(String.class));
+    }
+
+    @Test(expected = IncorrectCredentialsException.class)
+    public void checkBadAnonymousAutc() throws Exception {
+        SecurityServerClient client = createMock(SecurityServerClient.class);
+        expect(client.authenticatePrincipalSimple("anonymous", "anonymous1")).andThrow(
+                new InvalidAuthenticationException());
+        replay(client);
+
+        CrowdUserDataService service = new CrowdUserDataService();
+        ReflectionHelper.setField(service, "crowdClient", client);
+
+        UsernamePasswordToken token = new UsernamePasswordToken("anonymous", "anonymous1");
+        service.authenticate(token, "test");
+    }
+
+    @Test
+    public void checkAnonymousAutz() throws Exception {
+        CrowdUserDataService service = new CrowdUserDataService();
+        List<String> roles = service.getRoles("anonymous");
+        Assert.assertEquals(Arrays.asList("anonymous"), roles);
+
+        ReflectionHelper.setField(service, "anonymousRole", "custom-anonymous");
+        roles = service.getRoles("anonymous");
+        Assert.assertEquals(Arrays.asList("custom-anonymous"), roles);
+    }
 
     @Test
     public void checkWhenUsingGroups() throws Exception {

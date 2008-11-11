@@ -31,16 +31,17 @@ import com.atlassian.crowd.integration.service.soap.client.SecurityServerClientI
 public class CrowdUserDataService extends AbstractLogEnabled implements ExternalUserDataService,
         Initializable {
 
-    private SecurityServerClient crowdClient;
+    private static final String ANONYMOUS = "anonymous";
 
     /**
-     * If true, Crowd groups will be used to populate the role list. If false,
-     * Crowd roles will be used.
+     * If you have created a custom role for the anonymous user, specify that
+     * here.
      * 
      * @plexus.configuration
      */
+    private String anonymousRole = ANONYMOUS;
 
-    private boolean useGroups;
+    private SecurityServerClient crowdClient;
 
     /**
      * @plexus.configuration
@@ -52,42 +53,60 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
      */
     private String rolePrefix;
 
+    /**
+     * If true, Crowd groups will be used to populate the role list. If false,
+     * Crowd roles will be used.
+     * 
+     * @plexus.configuration
+     */
+
+    private boolean useGroups;
+
     public AuthenticationInfo authenticate(UsernamePasswordToken token, String name) {
-        try {
-            crowdClient.authenticatePrincipalSimple(token.getUsername(), new String(token
-                    .getPassword()));
+        if (isAnonymous(token)) {
             return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), name);
-        } catch (RemoteException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthorizationTokenException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (ApplicationAccessDeniedException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthenticationException e) {
-            throw new IncorrectCredentialsException(e);
-        } catch (InactiveAccountException e) {
-            throw new DisabledAccountException(e);
+        } else {
+            try {
+                crowdClient.authenticatePrincipalSimple(token.getUsername(), new String(token
+                        .getPassword()));
+                return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(),
+                        name);
+            } catch (RemoteException e) {
+                throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+            } catch (InvalidAuthorizationTokenException e) {
+                throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+            } catch (ApplicationAccessDeniedException e) {
+                throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+            } catch (InvalidAuthenticationException e) {
+                throw new IncorrectCredentialsException(e);
+            } catch (InactiveAccountException e) {
+                throw new DisabledAccountException(e);
+            }
         }
     }
 
     public List<String> getRoles(String username) {
-        getLogger().info("Looking up role list for username: " + username);
+        if (ANONYMOUS.equals(username)) {
+            return Arrays.asList(anonymousRole);
+        } else {
+            getLogger().info("Looking up role list for username: " + username);
 
-        List<String> roles = getRoleList(username);
+            List<String> roles = getRoleList(username);
 
-        if (rolePrefix != null) {
-            for (int i = 0; i < roles.size(); i++) {
-                String role = roles.get(i);
-                if (role.startsWith(rolePrefix)) {
-                    role = role.substring(rolePrefix.length());
-                    roles.set(i, role);
+            if (rolePrefix != null) {
+                for (int i = 0; i < roles.size(); i++) {
+                    String role = roles.get(i);
+                    if (role.startsWith(rolePrefix)) {
+                        role = role.substring(rolePrefix.length());
+                        roles.set(i, role);
+                    }
                 }
             }
+
+            getLogger().info("Obtained role list: " + roles.toString());
+
+            return roles;
         }
-
-        getLogger().info("Obtained role list: " + roles.toString());
-
-        return roles;
     }
 
     public void initialize() throws InitializationException {
@@ -111,6 +130,11 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
             throw new MissingAccountException("User '" + username + "' cannot be retrieved.", e);
         }
         return roles;
+    }
+
+    private boolean isAnonymous(UsernamePasswordToken token) {
+        return ANONYMOUS.equals(token.getUsername())
+                && ANONYMOUS.equals(new String(token.getPassword()));
     }
 
 }
