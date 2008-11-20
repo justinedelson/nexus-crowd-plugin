@@ -1,43 +1,28 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.sonatype.nexus.plugins</groupId>
+    
+    <parent>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugins-parent</artifactId>
+      <version>1-SNAPSHOT</version>
+    </parent>
+    
     <artifactId>nexus-crowd-auth</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>Nexus Crowd Integration</name>
     <description>Integration between Nexus MRM and Crowd Identity Server.</description>
-    <developers>
-        <developer>
-            <id>jedelson</id>
-            <name>Justin Edelson</name>
-            <email>justin.edelson@mtvstaff.com</email>
-            <roles>
-                <role>developer</role>
-            </roles>
-        </developer>
-    </developers>
+    
     <scm>
         <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</url>
         <connection>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</connection>
         <developerConnection>https://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</developerConnection>
     </scm>
-    <repositories>
-        <repository>
-            <id>sonatype-forge</id>
-            <url>http://repository.sonatype.org/content/groups/forge/</url>
-        </repository>
-        <repository>
-            <id>atlassian</id>
-            <name>Atlassian Repo</name>
-            <url>https://maven.atlassian.com/public</url>
-        </repository>
-    </repositories>
+    
     <dependencies>
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-app</artifactId>
-            <version>${nexus.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.sonatype.nexus.plugins</groupId>
@@ -99,40 +84,25 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.4</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.mtvi.plateng</groupId>
             <artifactId>test-support</artifactId>
-            <version>1.0-alpha-4</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
-            <version>2.4</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>true</showDeprecation>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>    
+                            <goal>single</goal>    
                         </goals>
                     </execution>
                 </executions>
@@ -144,7 +114,4 @@
             </plugin>
         </plugins>
     </build>
-    <properties>
-    	<nexus.version>1.1.0</nexus.version>
-	</properties>
 </project>
