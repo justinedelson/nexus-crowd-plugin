@@ -22,7 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-app</artifactId>
+            <artifactId>nexus-rest-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.sonatype.nexus.plugins</groupId>
