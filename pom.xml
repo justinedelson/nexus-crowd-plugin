@@ -18,7 +18,16 @@
         <connection>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</connection>
         <developerConnection>https://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</developerConnection>
     </scm>
-    
+   <developers>
+    <developer>
+      <id>jedelson</id>
+      <name>Justin Edelson</name>
+      <email>justin.edelson@mtvstaff.com</email>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
     <dependencies>
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
