@@ -13,6 +13,10 @@
     <name>Nexus Crowd Integration</name>
     <description>Integration between Nexus MRM and Crowd Identity Server.</description>
     
+    <properties>
+        <nexus.version>1.2.0.4</nexus.version>
+    </properties>
+    
     <scm>
         <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</url>
         <connection>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</connection>
@@ -41,7 +45,7 @@
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
             <artifactId>crowd-integration-client</artifactId>
-            <version>1.5</version>
+            <version>1.6</version>
             <!-- these exclusions are all provided by nexus -->
             <exclusions>
                 <exclusion>
@@ -111,7 +115,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>    
+                            <goal>attached</goal>    
                         </goals>
                     </execution>
                 </executions>
