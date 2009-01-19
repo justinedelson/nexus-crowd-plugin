@@ -1,7 +1,24 @@
+ -----
+ Installation
+ -----
+ Justin Edelson
+ -----
+ 01/18/2009
+ -----
 
-  [[1]] Unzip the zip file into the nexus root directory. This will add all the necessary JAR files to runtime/apps/nexus/lib.
+Installation
 
-  [[2]] Add a component definition to conf/plexus.xml. A sample is provided in conf/plexus-sample.xml
+* Standalone Distribution
+
+  Unzip the zip file into the nexus application directory. This will add all the necessary JAR files to runtime/apps/nexus/lib.
+  
+* WAR Distribution
+
+  TBD
+  
+Configuration
+
+  [[1]] Add a component definition to conf/plexus.xml. A sample is provided in conf/plexus-sample.xml
   
 +------------------
 <component>
@@ -31,31 +48,28 @@
 </component>
 +------------------
 
-  [[3]] By default, Crowd roles will be used. If you want to use Crowd groups instead add this configuration:
+  [[2]] By default, Crowd roles will be used. If you want to use Crowd groups instead add this configuration:
   
 +------------------
        <useGroups>true</useGroups>
 +------------------
 
-  [[4]] By default, the names of Crowd roles (or groups) will be used verbatim. It can be desirable to use
+  [[3]] By default, the names of Crowd roles (or groups) will be used verbatim. It can be desirable to use
   a mapping between Crowd roles and Nexus roles. To do this, provide the mapper's name (hint):
 
 +------------------
 		<mapperName>prefix-based</mapperName>
 +------------------
 
-  [[5]] As of Nexus 1.1, the anonymous role is locked, so if you've created a custom "anonymous" role, you need to specify that:
+  [[4]] By default, the Crowd plugin will not authenticate the anonymous user against Crowd. Instead,
+  the roles defined in the security.xml file will be used. To have anonymous access authenticated
+  against the Crowd server, enable the authenticateAnonymous property.
   
 +------------------
-       <anonymousRole>custom-anonymous</anonymousRole>
+       <authenticateAnonymous>true</authenticateAnonymous>
 +------------------
 
-  [[6]] Edit the security realms in sonatype-work/nexus/conf/nexus.xml to match this:
+  [[5]] Log in as an administrator to Nexus and then select the Crowd plugin's security realms
+  on the Server Administration page:
   
-+------------------
-    <realms>
-      <realm>CrowdAuthenticatingRealm</realm>
-      <realm>NexusCrowdMethodAuthorizingRealm</realm>
-      <realm>NexusCrowdTargetAuthorizingRealm</realm>
-    </realms>
-+------------------
+[images/screenshot.png]

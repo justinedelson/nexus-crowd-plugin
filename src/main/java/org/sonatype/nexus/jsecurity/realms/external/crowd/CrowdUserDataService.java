@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -31,6 +32,8 @@ import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.AuthorizationException;
 import org.jsecurity.authz.MissingAccountException;
+import org.sonatype.jsecurity.model.CUserRoleMapping;
+import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.nexus.jsecurity.realms.external.ExternalRoleMapper;
 import org.sonatype.nexus.jsecurity.realms.external.ExternalUserDataService;
 import org.sonatype.nexus.jsecurity.realms.external.ExternalUserRoleUtils;
@@ -53,16 +56,16 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
     /**
      * If you have created a custom role for the anonymous user, specify that
      * here.
-     * 
-     * @plexus.configuration
      */
-    private String anonymousRole = ANONYMOUS;
+    @Configuration(name = "authenticateAnonymous", value = "false")
+    private boolean authenticateAnonymous;
 
     private SecurityServerClient crowdClient;
 
     /**
-     * @plexus.configuration
+     * 
      */
+    @Configuration(name = "crowdProperties", value = "")
     private Properties crowdProperties;
 
     private ServiceLocator locator;
@@ -70,21 +73,19 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
     /**
      * The name of the ExternalRoleMapper that will be used to map external role
      * names to Nexus role names.
-     * 
-     * @plexus.configuration
      */
+    @Configuration(name = "mapperName", value = "")
     private String mapperName;
 
     /**
      * If true, Crowd groups will be used to populate the role list. If false,
      * Crowd roles will be used.
-     * 
-     * @plexus.configuration
      */
+    @Configuration(name = "useGroups", value = "false")
     private boolean useGroups;
 
     public AuthenticationInfo authenticate(UsernamePasswordToken token, String name) {
-        if (isAnonymous(token)) {
+        if ((!authenticateAnonymous) && isAnonymous(token)) {
             return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), name);
         } else {
             try {
@@ -108,7 +109,15 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
 
     public List<String> getRoles(String username) {
         if (ANONYMOUS.equals(username)) {
-            return Arrays.asList(anonymousRole);
+            try {
+                ConfigurationManager cfgMgr = (ConfigurationManager) locator.lookup(
+                        ConfigurationManager.class.getName(), "resourceMerging");
+                CUserRoleMapping mapping = cfgMgr.readUserRoleMapping(username, "default");
+                return mapping.getRoles();
+            } catch (Exception e) {
+                getLogger().error("Unable to discover roles for the anonymous user.", e);
+                return null;
+            }
         } else {
             getLogger().info("Looking up role list for username: " + username);
 

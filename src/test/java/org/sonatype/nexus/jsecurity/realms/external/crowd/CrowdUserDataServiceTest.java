@@ -19,11 +19,14 @@ import java.util.List;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
 import org.jsecurity.authc.IncorrectCredentialsException;
 import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityUserRoleMapping;
 
 import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
 import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
@@ -56,13 +59,27 @@ public class CrowdUserDataServiceTest {
 
     @Test
     public void checkAnonymousAutz() throws Exception {
-        CrowdUserDataService service = new CrowdUserDataService();
-        List<String> roles = service.getRoles("anonymous");
-        Assert.assertEquals(Arrays.asList("anonymous"), roles);
+        SecurityUserRoleMapping mapping = new SecurityUserRoleMapping();
+        mapping.addRole("anonymous");
+        mapping.addRole("otherrole");
 
-        ReflectionHelper.setField(service, "anonymousRole", "custom-anonymous");
-        roles = service.getRoles("anonymous");
-        Assert.assertEquals(Arrays.asList("custom-anonymous"), roles);
+        ConfigurationManager mgr = createMock(ConfigurationManager.class);
+        expect(mgr.readUserRoleMapping("anonymous", "default")).andReturn(mapping);
+
+        ServiceLocator locator = createMock(ServiceLocator.class);
+        expect(locator.lookup(ConfigurationManager.class.getName(), "resourceMerging")).andReturn(
+                mgr);
+
+        replay(locator, mgr);
+
+        CrowdUserDataService service = new CrowdUserDataService();
+        service.service(locator);
+
+        List<String> roles = service.getRoles("anonymous");
+
+        verify(locator, mgr);
+
+        Assert.assertEquals(Arrays.asList("anonymous", "otherrole"), roles);
     }
 
     @Test

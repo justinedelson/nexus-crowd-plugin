@@ -1,6 +1,7 @@
 <assembly>
     <id>nexus-plugin</id>
-    <baseDirectory>nexus-webapp-${nexus.version}</baseDirectory>
+    <baseDirectory></baseDirectory>
+    <!-- <baseDirectory>nexus-webapp-${nexus.version}</baseDirectory>-->
     <formats>
         <format>zip</format>
     </formats>
