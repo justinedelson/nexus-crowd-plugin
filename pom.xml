@@ -8,14 +8,14 @@
     </parent>
     
     <artifactId>nexus-crowd-auth</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <name>Nexus Crowd Integration</name>
     <description>Integration between Nexus MRM and Crowd Identity Server.</description>
     
     <scm>
-        <url>http://svn.sonatype.org/nexus-plugins/tags/nexus-crowd-auth-1.0</url>
-        <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/tags/nexus-crowd-auth-1.0</connection>
-        <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/tags/nexus-crowd-auth-1.0</developerConnection>
+        <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</url>
+        <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</connection>
+        <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-auth</developerConnection>
     </scm>
    <developers>
     <developer>
