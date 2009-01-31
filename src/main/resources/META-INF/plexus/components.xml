@@ -2,7 +2,7 @@
     <components>
         <component>
             <role>org.jsecurity.realm.Realm</role>
-            <role-hint>CrowdAuthenticatingRealm</role-hint>
+            <role-hint>Crowd</role-hint>
             <implementation>
                 org.sonatype.nexus.jsecurity.realms.external.ExternalUserAuthenticatingRealm
             </implementation>

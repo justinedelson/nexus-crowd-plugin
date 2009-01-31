@@ -5,7 +5,8 @@
     <formats>
         <format>zip</format>
     </formats>
-    <fileSets>
+    <!-- <fileSets>
+   
         <fileSet>
             <directory>src/main/assembly</directory>
             <includes>
@@ -13,7 +14,7 @@
             </includes>
             <outputDirectory>conf</outputDirectory>            
         </fileSet>
-    </fileSets>
+    </fileSets> -->
     <dependencySets>
         <dependencySet>
             <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
