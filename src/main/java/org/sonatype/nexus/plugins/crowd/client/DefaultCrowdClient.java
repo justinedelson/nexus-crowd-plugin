@@ -6,14 +6,11 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Serviceable;
-import org.sonatype.nexus.jsecurity.realms.external.ExternalRoleMapper;
-import org.sonatype.nexus.jsecurity.realms.external.ExternalUserRoleUtils;
 import org.sonatype.nexus.plugins.crowd.config.CrowdPluginConfiguration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 
@@ -178,6 +175,17 @@ public class DefaultCrowdClient extends AbstractLogEnabled implements Serviceabl
         return crowdClient.findRoleMemberships(principalName);
     }
 
+    public List<String> getAllNexusRoles() throws RemoteException,
+            InvalidAuthorizationTokenException {
+        List<String> roles;
+        if (configuration.isUseGroups()) {
+            roles = Arrays.asList(crowdClient.findAllGroupNames());
+        } else {
+            roles = Arrays.asList(crowdClient.findAllRoleNames());
+        }
+        return roles;
+    }
+
     public long getCacheTime() throws RemoteException, InvalidAuthorizationTokenException {
         return crowdClient.getCacheTime();
     }
@@ -209,17 +217,6 @@ public class DefaultCrowdClient extends AbstractLogEnabled implements Serviceabl
             roles = Arrays.asList(crowdClient.findGroupMemberships(username));
         } else {
             roles = Arrays.asList(crowdClient.findRoleMemberships(username));
-        }
-
-        try {
-            String mapperName = configuration.getMapperName();
-            if (mapperName != null && locator.hasComponent(ExternalRoleMapper.ROLE, mapperName)) {
-                ExternalRoleMapper mapper = (ExternalRoleMapper) locator.lookup(
-                        ExternalRoleMapper.ROLE, mapperName);
-                roles = ExternalUserRoleUtils.mapRoles(roles, mapper);
-            }
-        } catch (ComponentLookupException e) {
-            getLogger().error("Unable to map role names.", e);
         }
 
         getLogger().debug("Obtained role list: " + roles.toString());
@@ -336,29 +333,6 @@ public class DefaultCrowdClient extends AbstractLogEnabled implements Serviceabl
             throws RemoteException, InvalidAuthorizationTokenException, InvalidCredentialException,
             ObjectNotFoundException, ApplicationPermissionException {
         crowdClient.updatePrincipalCredential(principal, credential);
-    }
-
-    public List<String> getAllNexusRoles() throws RemoteException,
-            InvalidAuthorizationTokenException {
-        List<String> roles;
-        if (configuration.isUseGroups()) {
-            roles = Arrays.asList(crowdClient.findAllGroupNames());
-        } else {
-            roles = Arrays.asList(crowdClient.findAllRoleNames());
-        }
-
-        try {
-            String mapperName = configuration.getMapperName();
-            if (mapperName != null && locator.hasComponent(ExternalRoleMapper.ROLE, mapperName)) {
-                ExternalRoleMapper mapper = (ExternalRoleMapper) locator.lookup(
-                        ExternalRoleMapper.ROLE, mapperName);
-                roles = ExternalUserRoleUtils.mapRoles(roles, mapper);
-            }
-        } catch (ComponentLookupException e) {
-            getLogger().error("Unable to map role names.", e);
-        }
-
-        return roles;
     }
 
 }

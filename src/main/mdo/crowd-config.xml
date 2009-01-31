@@ -60,13 +60,6 @@
                     <required>false</required>
                 </field>
                 <field>
-                    <name>mapperName</name>
-                    <version>1.0.0+</version>
-                    <description>Plexus component name of the ExternalRoleMapper to use to convert Crowd roles into Nexus roles.</description>
-                    <type>String</type>
-                    <required>false</required>
-                </field>
-                <field>
                     <name>useGroups</name>
                     <version>1.0.0+</version>
                     <description>If true, Crowd groups will be used as the source of Nexus role names.</description>

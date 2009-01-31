@@ -22,6 +22,12 @@ import com.google.common.collect.Sets;
 
 public abstract class BaseCrowdLocator extends AbstractLogEnabled {
 
+    public static final String ATTRIBUTE_LAST_NAME = "sn";
+
+    public static final String ATTRIBUTE_FIRST_NAME = "givenName";
+
+    public static final String ATTRIBUTE_MAIL = "mail";
+
     public static final String SOURCE = "Crowd";
 
     @Requirement
@@ -80,11 +86,11 @@ public abstract class BaseCrowdLocator extends AbstractLogEnabled {
         PlexusUser user = new PlexusUser();
         user.setUserId(principal.getName());
         try {
-            setIfAttributeExists(user, "emailAddress", principal, "mail");
+            setIfAttributeExists(user, "emailAddress", principal, ATTRIBUTE_MAIL);
         } catch (Exception e) {
         }
-        String givenName = getAttributeValue(principal, "givenName");
-        String surName = getAttributeValue(principal, "sn");
+        String givenName = getAttributeValue(principal, ATTRIBUTE_FIRST_NAME);
+        String surName = getAttributeValue(principal, ATTRIBUTE_LAST_NAME);
         user.setName(String.format("%s %s", givenName, surName));
         user.setSource(SOURCE);
         user.setRoles(getRoles(user.getUserId()));

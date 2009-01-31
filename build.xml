@@ -1,5 +1,0 @@
-<project>
-	<target name="copy">
-		<copy tofile="C:\java\nexus\nexus-webapp-1.2.1\runtime\apps\nexus\lib\nexus-crowd-plugin.jar" file="target/nexus-crowd-auth-1.1-SNAPSHOT-jar-with-dependencies.jar" />
-	</target>
-</project>

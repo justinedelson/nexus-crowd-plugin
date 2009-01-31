@@ -13,39 +13,74 @@
 package org.sonatype.nexus.jsecurity.realms.external.crowd;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
+import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.DisabledAccountException;
 import org.jsecurity.authc.IncorrectCredentialsException;
 import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.MissingAccountException;
-import org.sonatype.nexus.jsecurity.realms.external.ExternalUserDataService;
+import org.jsecurity.authc.pam.UnsupportedTokenException;
+import org.jsecurity.authz.AuthorizationInfo;
+import org.jsecurity.realm.AuthorizingRealm;
+import org.jsecurity.realm.Realm;
+import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClient;
 
 import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
 import com.atlassian.crowd.integration.exception.InactiveAccountException;
 import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
 import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
 
-@Component(role = ExternalUserDataService.class, hint = "crowd")
-public class CrowdUserDataService extends AbstractLogEnabled implements ExternalUserDataService {
+@Component(role = Realm.class, hint = "Crowd")
+public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initializable, Disposable {
+
+    private static boolean active;
 
     @Requirement
     private CrowdClient crowdClient;
 
-    public AuthenticationInfo authenticate(UsernamePasswordToken token, String name) {
+    public static boolean isActive() {
+        return active;
+    }
+
+    public void dispose() {
+        active = false;
+        System.out.println("Crowd Realm deactivated...");
+    }
+
+    @Override
+    public String getName() {
+        return CrowdAuthenticatingRealm.class.getName();
+    }
+
+    public void initialize() throws InitializationException {
+        System.out.println("Crowd Realm activated...");
+        active = true;
+    }
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken)
+            throws AuthenticationException {
+        if (!(authenticationToken instanceof UsernamePasswordToken)) {
+            throw new UnsupportedTokenException("Token of type "
+                    + authenticationToken.getClass().getName() + " is not " + "supported.  A "
+                    + UsernamePasswordToken.class.getName() + " is required.");
+        }
+        UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
+
+        String password = new String(token.getPassword());
+
         try {
-            crowdClient.authenticatePrincipalSimple(token.getUsername(), new String(token
-                    .getPassword()));
-            return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(), name);
+            crowdClient.authenticatePrincipalSimple(token.getUsername(), password);
+            return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(),
+                    getName());
         } catch (RemoteException e) {
             throw new AuthenticationException("Could not retrieve info from Crowd.", e);
         } catch (InvalidAuthorizationTokenException e) {
@@ -59,16 +94,9 @@ public class CrowdUserDataService extends AbstractLogEnabled implements External
         }
     }
 
-    public List<String> getRoles(String username) {
-        try {
-            return crowdClient.getNexusRoles(username);
-        } catch (RemoteException e) {
-            throw new AuthorizationException("Unable to connect to Crowd.", e);
-        } catch (InvalidAuthorizationTokenException e) {
-            throw new AuthorizationException("Unable to connect to Crowd.", e);
-        } catch (ObjectNotFoundException e) {
-            throw new MissingAccountException("User '" + username + "' cannot be retrieved.", e);
-        }
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        return null;
     }
 
 }

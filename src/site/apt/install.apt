@@ -10,7 +10,7 @@ Installation
 
 * Standalone Distribution
 
-  Unzip the zip file into the nexus application directory. This will add all the necessary JAR files to runtime/apps/nexus/lib.
+  Add the plugin JAR file in the runtime/apps/nexus/lib directory.
   
 * WAR Distribution
 
@@ -18,34 +18,16 @@ Installation
   
 Configuration
 
-  [[1]] Add a component definition to conf/plexus.xml. A sample is provided in conf/plexus-sample.xml
+  [[1]] Create a file called crowd-plugin.xml in the sonatype-work/nexus/conf directory, i.e. next
+  to the nexus.xml file. This file must, at minimum, contain the following content:
   
 +------------------
-<component>
-    <role>org.sonatype.nexus.jsecurity.realms.external.ExternalUserDataService</role>
-    <role-hint>crowd</role-hint>
-    <implementation>org.sonatype.nexus.jsecurity.realms.external.crowd.CrowdUserDataService</implementation>
-    <configuration>
-		<crowdProperties>
-    		<property>
-				<name>application.name</name>
-				<value>nexus</value>
-    		</property>
-    		<property>
-				<name>application.password</name>
-				<value>SECRET</value>
-    		</property>
-    		<property>
-				<name>crowd.server.url</name>
-				<value>http://mycrowd/services/</value>
-    		</property>
-    		<property>
-				<name>session.validationinterval</name>
-				<value>30</value>
-    		</property>
-		</crowdProperties>
-    </configuration>
-</component>
+<?xml version="1.0" encoding="UTF-8"?>
+<crowdConfiguration>
+  <crowdServerUrl>http://mycrowd/services/</crowdServerUrl>
+  <applicationName>nexus</applicationName>
+  <applicationPassword>SECRET</applicationPassword>
+</crowdConfiguration>
 +------------------
 
   [[2]] By default, Crowd roles will be used. If you want to use Crowd groups instead add this configuration:
@@ -54,22 +36,7 @@ Configuration
        <useGroups>true</useGroups>
 +------------------
 
-  [[3]] By default, the names of Crowd roles (or groups) will be used verbatim. It can be desirable to use
-  a mapping between Crowd roles and Nexus roles. To do this, provide the mapper's name (hint):
-
-+------------------
-		<mapperName>prefix-based</mapperName>
-+------------------
-
-  [[4]] By default, the Crowd plugin will not authenticate the anonymous user against Crowd. Instead,
-  the roles defined in the security.xml file will be used. To have anonymous access authenticated
-  against the Crowd server, enable the authenticateAnonymous property.
-  
-+------------------
-       <authenticateAnonymous>true</authenticateAnonymous>
-+------------------
-
-  [[5]] Log in as an administrator to Nexus and then select the Crowd plugin's security realms
+  [[3]] Log in as an administrator to Nexus and then select the Crowd plugin's security realm
   on the Server Administration page:
   
 [images/screenshot.png]
