@@ -39,6 +39,7 @@
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-rest-api</artifactId>
             <version>${nexus.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.collections</groupId>
@@ -140,10 +141,26 @@
             <plugin>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-component-metadata</artifactId>
+                <version>RELEASE</version>
+                <executions>
+                    <execution>
+                        <id>process-classes</id>
+                        <goals>
+                            <goal>generate-metadata</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>process-test-classes</id>
+                        <goals>
+                            <goal>generate-test-metadata</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.modello</groupId>
                 <artifactId>modello-maven-plugin</artifactId>
+                <version>RELEASE</version>
                 <executions>
                     <execution>
                         <id>crowd-config.xml</id>
