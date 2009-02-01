@@ -39,7 +39,7 @@ public class CrowdTestPlexusResource extends AbstractPlexusResource {
 
     @Override
     public PathProtectionDescriptor getResourceProtection() {
-        return new PathProtectionDescriptor("/crowd/test/", "anon");
+        return new PathProtectionDescriptor("/crowd/test", "anon");
     }
 
     @Override
