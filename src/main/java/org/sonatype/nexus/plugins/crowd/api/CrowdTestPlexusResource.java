@@ -52,7 +52,7 @@ public class CrowdTestPlexusResource extends AbstractPlexusResource {
             throws ResourceException {
         try {
             crowdClient.authenticate();
-            return "OK";
+            return "<status>OK</status>";
         } catch (RemoteException e) {
             throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
                     "Unable to authenticate. Check configuration.", e);
