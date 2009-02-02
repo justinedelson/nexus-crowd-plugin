@@ -10,7 +10,8 @@ Installation
 
 * Standalone Distribution
 
-  Add the plugin JAR file in the runtime/apps/nexus/lib directory.
+  Unzip the plugin ZIP file into the Nexus root directory. This will place
+  the necessary files in the runtime/apps/nexus/lib subdirectory.
   
 * WAR Distribution
 
@@ -36,7 +37,11 @@ Configuration
        <useGroups>true</useGroups>
 +------------------
 
-  [[3]] Log in as an administrator to Nexus and then select the Crowd plugin's security realm
+  [[3]] Start up Nexus. You can test that the configuration is valid by hitting the URL http://SERVER:PORT/nexus/service/local/crowd/test.
+  If you get back an OK status, the configuration is valid and you can proceed. If not, check your
+  configuration.
+
+  [[4]] Log in as an administrator to Nexus and then select the Crowd plugin's security realm
   on the Server Administration page:
   
 [images/screenshot.png]
