@@ -7,11 +7,10 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusRoleLocator;
-import org.sonatype.jsecurity.locators.users.PlexusUserLocator;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
-@Component(role = PlexusUserLocator.class, hint = "Crowd")
+@Component(role = PlexusRoleLocator.class, hint = "Crowd")
 public class CrowdRoleLocator extends BaseCrowdLocator implements PlexusRoleLocator {
 
     public String getSource() {
