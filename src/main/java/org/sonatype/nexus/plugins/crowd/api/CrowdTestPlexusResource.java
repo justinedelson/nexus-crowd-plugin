@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
+ */
 package org.sonatype.nexus.plugins.crowd.api;
 
 import java.rmi.RemoteException;
@@ -10,7 +22,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.plugins.crowd.client.CrowdClient;
+import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -21,8 +33,6 @@ import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenExcept
  * Intent of this class is to enable an admin to easily test if the Crowd
  * connection is working <b>without</b> enabling the Realm.
  * 
- * But it doesn't work (yet).
- * 
  * @author Justin Edelson
  * 
  */
@@ -30,7 +40,7 @@ import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenExcept
 public class CrowdTestPlexusResource extends AbstractPlexusResource {
 
     @Requirement
-    private CrowdClient crowdClient;
+    private CrowdClientHolder crowdClientHolder;
 
     @Override
     public Object getPayloadInstance() {
@@ -51,7 +61,7 @@ public class CrowdTestPlexusResource extends AbstractPlexusResource {
     public Object get(Context context, Request request, Response response, Variant variant)
             throws ResourceException {
         try {
-            crowdClient.authenticate();
+            crowdClientHolder.getSecurityServerClient().authenticate();
             return "<status>OK</status>";
         } catch (RemoteException e) {
             throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,

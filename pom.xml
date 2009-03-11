@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>nexus-crowd-plugin</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
     <name>Nexus Crowd Integration</name>
     <description>Integration between Nexus MRM and Crowd Identity Server.</description>
 
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
             <artifactId>crowd-integration-client</artifactId>
-            <version>1.6</version>
+            <version>1.6.1</version>
             <!-- these exclusions are all provided by nexus -->
             <exclusions>
                 <exclusion>
@@ -175,6 +175,17 @@
                     <packageWithVersion>true</packageWithVersion>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <header>src/main/etc/license.txt</header>
+                    <excludes>
+                        <exclude>**/*.class</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <reporting>
@@ -190,7 +201,7 @@
     </reporting>
     
     <properties>
-        <nexus.version>1.2.1</nexus.version>
+        <nexus.version>1.3.0</nexus.version>
     </properties>
     
     <!-- <profiles>

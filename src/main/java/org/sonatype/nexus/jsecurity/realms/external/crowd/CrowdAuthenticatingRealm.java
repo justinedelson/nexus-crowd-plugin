@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
+ * Copyright (c) 2009 Sonatype, Inc. All rights reserved.
  *
  * This program is licensed to you under the Apache License Version 2.0,
  * and you may not use this file except in compliance with the Apache License Version 2.0.
@@ -31,7 +31,7 @@ import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
-import org.sonatype.nexus.plugins.crowd.client.CrowdClient;
+import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 
 import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
 import com.atlassian.crowd.integration.exception.InactiveAccountException;
@@ -44,7 +44,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
     private static boolean active;
 
     @Requirement
-    private CrowdClient crowdClient;
+    private CrowdClientHolder crowdClientHolder;
 
     public static boolean isActive() {
         return active;
@@ -78,7 +78,8 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
         String password = new String(token.getPassword());
 
         try {
-            crowdClient.authenticatePrincipalSimple(token.getUsername(), password);
+            crowdClientHolder.getAuthenticationManager()
+                    .authenticate(token.getUsername(), password);
             return new SimpleAuthenticationInfo(token.getPrincipal(), token.getCredentials(),
                     getName());
         } catch (RemoteException e) {

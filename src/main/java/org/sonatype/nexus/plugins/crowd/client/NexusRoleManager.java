@@ -10,34 +10,25 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.nexus.jsecurity.realms.external.crowd;
+package org.sonatype.nexus.plugins.crowd.client;
 
-import static org.junit.Assert.*;
+import java.rmi.RemoteException;
+import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
 
-public class CrowdAuthenticatingRealmTest {
+/**
+ * Adapter interface that allows Nexus to switch between Crowd groups and Crowd
+ * roles.
+ * 
+ * @author Justin Edelson
+ */
+public interface NexusRoleManager {
 
-    private CrowdAuthenticatingRealm realm;
+    List<String> getNexusRoles(String username) throws RemoteException,
+            InvalidAuthorizationTokenException, ObjectNotFoundException;
 
-    @Before
-    public void setup() {
-        realm = new CrowdAuthenticatingRealm();
-
-    }
-
-    @Test
-    public void checkActiveFlag() throws Exception {
-        assertFalse(realm.isActive());
-        realm.initialize();
-        assertTrue(realm.isActive());
-    }
-
-    @After
-    public void teardown() {
-        realm.dispose();
-    }
+    List<String> getAllNexusRoles() throws RemoteException, InvalidAuthorizationTokenException;
 
 }

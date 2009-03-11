@@ -10,34 +10,23 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.nexus.jsecurity.realms.external.crowd;
+/**
+ * 
+ */
+package org.sonatype.nexus.plugins.crowd.caching;
 
-import static org.junit.Assert.*;
+import com.atlassian.crowd.integration.service.cache.BasicCache;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+/**
+ * Extension of Crowd's BasicCache interface to enable authentication caching.
+ * 
+ * @author Justin Edelson
+ * 
+ */
+public interface AuthBasicCache extends BasicCache {
 
-public class CrowdAuthenticatingRealmTest {
+    String getToken(String username, String password);
 
-    private CrowdAuthenticatingRealm realm;
-
-    @Before
-    public void setup() {
-        realm = new CrowdAuthenticatingRealm();
-
-    }
-
-    @Test
-    public void checkActiveFlag() throws Exception {
-        assertFalse(realm.isActive());
-        realm.initialize();
-        assertTrue(realm.isActive());
-    }
-
-    @After
-    public void teardown() {
-        realm.dispose();
-    }
+    void addOrReplaceToken(String username, String password, String token);
 
 }
