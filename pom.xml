@@ -91,6 +91,10 @@
                     <artifactId>xmlParserAPIs</artifactId>
                     <groupId>xerces</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>stax-api</artifactId>
+                    <groupId>stax</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
