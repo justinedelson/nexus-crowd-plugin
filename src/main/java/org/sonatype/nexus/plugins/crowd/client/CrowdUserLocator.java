@@ -122,7 +122,7 @@ public class CrowdUserLocator extends BaseCrowdLocator implements PlexusUserLoca
         } else {
             searchRestrictions.add(new SearchRestriction(SearchContext.PRINCIPAL_NAME, ""));
         }
-        searchRestrictions.add(new SearchRestriction(SearchContext.SEARCH_INDEX_START, "1"));
+        searchRestrictions.add(new SearchRestriction(SearchContext.SEARCH_INDEX_START, "0"));
         searchRestrictions.add(new SearchRestriction(SearchContext.SEARCH_MAX_RESULTS, Integer
                 .toString(maxResults)));
         if (roles != null) {
