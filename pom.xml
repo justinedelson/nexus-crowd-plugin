@@ -4,18 +4,18 @@
     <parent>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-plugins-parent</artifactId>
-        <version>5-SNAPSHOT</version>
+        <version>4</version>
     </parent>
 
     <artifactId>nexus-crowd-plugin</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <name>Nexus Crowd Integration</name>
     <description>Integration between Nexus MRM and Crowd Identity Server.</description>
 
     <scm>
-        <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-plugin</url>
-        <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-plugin</connection>
-        <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-crowd-plugin</developerConnection>
+        <url>http://github.com/justinedelson/nexus-crowd-plugin</url>
+        <connection>scm:git:git://github.com/justinedelson/nexus-crowd-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:justinedelson/nexus-crowd-plugin.git</developerConnection>
     </scm>
 
     <developers>
@@ -35,11 +35,6 @@
             <artifactId>nexus-rest-api</artifactId>
             <version>${nexus.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.collections</groupId>
-            <artifactId>google-collections</artifactId>
-            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
@@ -101,12 +96,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.mtvi.plateng</groupId>
-            <artifactId>test-support</artifactId>
-            <version>1.0-alpha-4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -203,11 +192,11 @@
     		</plugin>
     	</plugins>
     </reporting>
-    
+
     <properties>
-        <nexus.version>1.3.0</nexus.version>
+        <nexus.version>1.5.0</nexus.version>
     </properties>
-    
+
     <!-- <profiles>
         <profile>
             <id>install-to-nexus</id>
