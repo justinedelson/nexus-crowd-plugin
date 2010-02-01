@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 /**
- * 
+ *
  */
 package org.sonatype.nexus.plugins.crowd.client;
 
@@ -41,13 +41,14 @@ import com.atlassian.crowd.integration.service.soap.client.SecurityServerClientI
 
 /**
  * Implementation of the CrowdClientHolder which uses caching wherever possible.
- * 
+ *
  * @author Justin Edelson
- * 
+ *
  */
 @Component(role = CrowdClientHolder.class, hint = "default")
-public class DefaultCrowdClientHolder extends AbstractLogEnabled implements CrowdClientHolder,
-        Initializable {
+public class DefaultCrowdClientHolder extends AbstractLogEnabled implements CrowdClientHolder, Initializable {
+
+    private boolean configured = false;
 
     private AuthenticationManager authenticationManager;
 
@@ -102,16 +103,18 @@ public class DefaultCrowdClientHolder extends AbstractLogEnabled implements Crow
     public void initialize() throws InitializationException {
         basicCache = new AuthCacheImpl(cacheManager.getEhCacheManager());
         configuration = crowdPluginConfiguration.getConfiguration();
-        ClientProperties clientProps = new ClientPropertiesImpl(configuration
-                .getCrowdClientProperties());
-        securityServerClient = new SecurityServerClientImpl(clientProps);
-        userManager = new CachingUserManager(securityServerClient, basicCache);
-        groupManager = new CachingGroupManager(securityServerClient, basicCache);
-        groupMembershipManager = new CachingGroupMembershipManager(securityServerClient,
-                userManager, groupManager, basicCache);
-        authenticationManager = new CachingAuthenticationManager(securityServerClient, basicCache);
-        nexusRoleManager = new DefaultNexusRoleManager(configuration.isUseGroups(), groupManager,
-                groupMembershipManager, securityServerClient);
+        if (configuration != null) {
+            ClientProperties clientProps = new ClientPropertiesImpl(configuration.getCrowdClientProperties());
+            securityServerClient = new SecurityServerClientImpl(clientProps);
+            userManager = new CachingUserManager(securityServerClient, basicCache);
+            groupManager = new CachingGroupManager(securityServerClient, basicCache);
+            groupMembershipManager = new CachingGroupMembershipManager(securityServerClient, userManager, groupManager,
+                    basicCache);
+            authenticationManager = new CachingAuthenticationManager(securityServerClient, basicCache);
+            nexusRoleManager = new DefaultNexusRoleManager(configuration.isUseGroups(), groupManager,
+                    groupMembershipManager, securityServerClient);
+            configured = true;
+        }
 
     }
 

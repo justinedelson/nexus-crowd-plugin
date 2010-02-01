@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -9,8 +10,10 @@
 
     <artifactId>nexus-crowd-plugin</artifactId>
     <version>1.5.0-SNAPSHOT</version>
+    <packaging>nexus-plugin</packaging>
     <name>Nexus Crowd Integration</name>
     <description>Integration between Nexus MRM and Crowd Identity Server.</description>
+    <url>http://github.com/justinedelson/nexus-crowd-plugin</url>
 
     <scm>
         <url>http://github.com/justinedelson/nexus-crowd-plugin</url>
@@ -90,6 +93,10 @@
                     <artifactId>stax-api</artifactId>
                     <groupId>stax</groupId>
                 </exclusion>
+                <exclusion>
+                	<artifactId>commons-logging</artifactId>
+                	<groupId>commons-logging</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -102,6 +109,18 @@
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
             <version>2.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit-addons</groupId>
+            <artifactId>junit-addons</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -126,7 +145,7 @@
             <plugin>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-component-metadata</artifactId>
-                <version>RELEASE</version>
+                <version>1.5.4</version>
                 <executions>
                     <execution>
                         <id>process-classes</id>
@@ -145,7 +164,7 @@
             <plugin>
                 <groupId>org.codehaus.modello</groupId>
                 <artifactId>modello-maven-plugin</artifactId>
-                <version>RELEASE</version>
+                <version>1.2</version>
                 <executions>
                     <execution>
                         <id>crowd-config.xml</id>
@@ -182,46 +201,26 @@
         </plugins>
     </build>
     <reporting>
-    	<plugins>
-    		<plugin>
-    			<artifactId>maven-project-info-reports-plugin</artifactId>
+        <plugins>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
                 <configuration>
                     <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
-    		</plugin>
-    	</plugins>
+            </plugin>
+        </plugins>
     </reporting>
 
     <properties>
         <nexus.version>1.5.0</nexus.version>
     </properties>
 
-    <!-- <profiles>
-        <profile>
-            <id>install-to-nexus</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <phase>install</phase>
-                                <configuration>
-                                    <tasks>
-                                        <copy tofile="${nexus.home}\nexus-webapp-${nexus.version}\runtime\apps\nexus\lib\nexus-crowd-plugin.jar" file="target/nexus-crowd-plugin-${project.version}-jar-with-dependencies.jar" />
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-
-            </build>
-        </profile>
-
-    </profiles> -->
+    <!--
+        <profiles> <profile> <id>install-to-nexus</id> <build> <plugins> <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions>
+        <execution> <goals> <goal>run</goal> </goals> <phase>install</phase> <configuration> <tasks> <copy
+        tofile="${nexus.home}\nexus-webapp-${nexus.version}\runtime\apps\nexus\lib\nexus-crowd-plugin.jar"
+        file="target/nexus-crowd-plugin-${project.version}-jar-with-dependencies.jar" /> </tasks> </configuration> </execution>
+        </executions> </plugin> </plugins> </build> </profile> </profiles>
+    -->
 </project>

@@ -17,17 +17,21 @@ import java.util.List;
 
 import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
 import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
+import com.atlassian.crowd.integration.soap.SOAPEntity;
 
 /**
  * Adapter interface that allows Nexus to switch between Crowd groups and Crowd
  * roles.
- * 
+ *
  * @author Justin Edelson
  */
 public interface NexusRoleManager {
 
-    List<String> getNexusRoles(String username) throws RemoteException,
-            InvalidAuthorizationTokenException, ObjectNotFoundException;
+    List<String> getNexusRoles(String username) throws RemoteException, InvalidAuthorizationTokenException,
+            ObjectNotFoundException;
+
+    SOAPEntity getNexusRole(String roleName) throws ObjectNotFoundException, InvalidAuthorizationTokenException,
+            RemoteException;
 
     List<String> getAllNexusRoles() throws RemoteException, InvalidAuthorizationTokenException;
 

@@ -24,6 +24,7 @@ import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
 import com.atlassian.crowd.integration.service.GroupManager;
 import com.atlassian.crowd.integration.service.GroupMembershipManager;
 import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.integration.soap.SOAPEntity;
 
 public class DefaultNexusRoleManager implements NexusRoleManager {
 
@@ -70,6 +71,17 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         }
 
         return roles;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SOAPEntity getNexusRole(String roleName) throws RemoteException, InvalidAuthorizationTokenException, ObjectNotFoundException {
+        if (useGroups) {
+            return groupManager.getGroup(roleName);
+        } else {
+            return securityServerClient.findRoleByName(roleName);
+        }
     }
 
 }

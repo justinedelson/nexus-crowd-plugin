@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -43,17 +44,61 @@ import com.google.common.collect.Sets;
  * @author justin
  *
  */
+@Component(role = UserManager.class, hint = "Crowd")
 public class CrowdUserManager extends AbstractReadOnlyUserManager implements UserManager, RoleMappingUserManager {
 
-    public static final String ATTRIBUTE_LAST_NAME = "sn";
+    public CrowdUserManager() {
+        logger.info("CrowdUserManager is starting...");
+    }
 
-    public static final String ATTRIBUTE_FIRST_NAME = "givenName";
+    protected static final String ATTRIBUTE_LAST_NAME = "sn";
 
-    public static final String ATTRIBUTE_MAIL = "mail";
+    protected static final String ATTRIBUTE_FIRST_NAME = "givenName";
 
-    public static final String REALM_NAME = "Crowd";
+    protected static final String ATTRIBUTE_MAIL = "mail";
 
-    public static final String SOURCE = "Crowd";
+    protected static final String REALM_NAME = "Crowd";
+
+    protected static final String SOURCE = "Crowd";
+
+    /**
+     * Get a single (the first) value from an attribute. Since Crowd attributes
+     * can be polyvalent, but are mostly univalent, there is frequently a lot of
+     * unnecessary verbosity.
+     *
+     * @param entity the entity to access
+     * @param attributeName the attribute name
+     * @return the first attribute value or null if there are no values or the
+     *         attribute doesn't exist
+     */
+    private static String getAttributeValue(SOAPEntity entity, String attributeName) {
+        SOAPAttribute attr = entity.getAttribute(attributeName);
+        if (attr != null && attr.getValues().length == 1) {
+            return attr.getValues()[0];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Set a bean property if (and only if) the attribute exists and is
+     * non-blank on the provided entity.
+     *
+     * @param bean the bean on which to set a property
+     * @param property the property name to set
+     * @param entity the Crowd entity from which to retreive the attribute
+     * @param attributeName the attribute name
+     * @throws IllegalAccessException if something goes wrong
+     * @throws InvocationTargetException if something goes wrong
+     * @throws NoSuchMethodException if something goes wrong
+     */
+    private static void setIfAttributeExists(Object bean, String property, SOAPEntity entity, String attributeName)
+            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        SOAPAttribute attr = entity.getAttribute(attributeName);
+        if (attr != null && attr.getValues().length == 1) {
+            PropertyUtils.setProperty(bean, property, attr.getValues()[0]);
+        }
+    }
 
     /**
      * The maximum number of results that will be returned from a user query.
@@ -99,63 +144,31 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
         }
     }
 
-    protected User convertToUser(SOAPPrincipal principal) {
-        User user = new DefaultUser();
-        user.setUserId(principal.getName());
-        try {
-            setIfAttributeExists(user, "emailAddress", principal, ATTRIBUTE_MAIL);
-        } catch (Exception e) {
-        }
-        String givenName = getAttributeValue(principal, ATTRIBUTE_FIRST_NAME);
-        String surName = getAttributeValue(principal, ATTRIBUTE_LAST_NAME);
-        user.setName(String.format("%s %s", givenName, surName));
-        user.setSource(SOURCE);
-        user.setStatus(principal.isActive() ? UserStatus.active : UserStatus.disabled);
-        user.setReadOnly(true);
-        try {
-            user.setRoles(getUsersRoles(principal.getName(), SOURCE));
-        } catch (UserNotFoundException e) {
-        }
-
-        return user;
-    }
-
     /**
-     * Get a single (the first) value from an attribute. Since Crowd attributes
-     * can be polyvalent, but are mostly univalent, there is frequently a lot of
-     * unnecessary verbosity.
-     *
-     * @param entity the entity to access
-     * @param attributeName the attribute name
-     * @return the first attribute value or null if there are no values or the
-     *         attribute doesn't exist
+     * {@inheritDoc}
      */
-    private static String getAttributeValue(SOAPEntity entity, String attributeName) {
-        SOAPAttribute attr = entity.getAttribute(attributeName);
-        if (attr != null && attr.getValues().length == 1) {
-            return attr.getValues()[0];
+    public Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException {
+        if (SOURCE.equals(userSource)) {
+            List<String> roleNames = null;
+            try {
+                roleNames = crowdClientHolder.getNexusRoleManager().getNexusRoles(userId);
+            } catch (RemoteException e) {
+                logger.error("Unable to look up user " + userId, e);
+                return Collections.emptySet();
+            } catch (InvalidAuthorizationTokenException e) {
+                logger.error("Unable to look up user " + userId, e);
+                return Collections.emptySet();
+            } catch (ObjectNotFoundException e) {
+                throw new UserNotFoundException(userId);
+            }
+            return Sets.newHashSet(Iterables.transform(roleNames, new Function<String, RoleIdentifier>() {
+
+                public RoleIdentifier apply(String from) {
+                    return new RoleIdentifier(SOURCE, from);
+                }
+            }));
         } else {
-            return null;
-        }
-    }
-
-    /**
-     * Set a bean property if (and only if) the attribute exists and is
-     * non-blank on the provided entity.
-     *
-     * @param bean the bean on which to set a property
-     * @param property the property name to set
-     * @param entity the Crowd entity from which to retreive the attribute
-     * @param attributeName the attribute name
-     * @throws IllegalAccessException if something goes wrong
-     * @throws InvocationTargetException if something goes wrong
-     * @throws NoSuchMethodException if something goes wrong
-     */
-    private static void setIfAttributeExists(Object bean, String property, SOAPEntity entity, String attributeName)
-            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        SOAPAttribute attr = entity.getAttribute(attributeName);
-        if (attr != null && attr.getValues().length == 1) {
-            PropertyUtils.setProperty(bean, property, attr.getValues()[0]);
+            return Collections.emptySet();
         }
     }
 
@@ -187,10 +200,19 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
         return search(criteria.getUserId(), criteria.getOneOfRoleIds(), criteria.getEmail());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setUsersRoles(String userId, String userSource, Set<RoleIdentifier> roleIdentifiers)
+            throws UserNotFoundException, InvalidConfigurationException {
+        super.setUsersRoles(userId, roleIdentifiers);
+    }
+
     @SuppressWarnings("unchecked")
     private Set<User> search(String userId, Set<String> roles, String email) {
         List<SearchRestriction> searchRestrictions = new ArrayList<SearchRestriction>();
 
+        searchRestrictions.add(new SearchRestriction(SearchContext.PRINCIPAL_ACTIVE, "true"));
         if (StringUtils.isNotEmpty(userId)) {
             searchRestrictions.add(new SearchRestriction(SearchContext.PRINCIPAL_NAME, userId));
         } else {
@@ -223,40 +245,25 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException {
-        if (SOURCE.equals(userSource)) {
-            List<String> roleNames = null;
-            try {
-                roleNames = crowdClientHolder.getNexusRoleManager().getNexusRoles(userId);
-            } catch (RemoteException e) {
-                logger.error("Unable to look up user " + userId, e);
-                return Collections.emptySet();
-            } catch (InvalidAuthorizationTokenException e) {
-                logger.error("Unable to look up user " + userId, e);
-                return Collections.emptySet();
-            } catch (ObjectNotFoundException e) {
-                throw new UserNotFoundException(userId);
-            }
-            return Sets.newHashSet(Iterables.transform(roleNames, new Function<String, RoleIdentifier>() {
-
-                public RoleIdentifier apply(String from) {
-                    return new RoleIdentifier(SOURCE, from);
-                }
-            }));
-        } else {
-            return Collections.emptySet();
+    protected User convertToUser(SOAPPrincipal principal) {
+        User user = new DefaultUser();
+        user.setUserId(principal.getName());
+        try {
+            setIfAttributeExists(user, "emailAddress", principal, ATTRIBUTE_MAIL);
+        } catch (Exception e) {
         }
-    }
+        String givenName = getAttributeValue(principal, ATTRIBUTE_FIRST_NAME);
+        String surName = getAttributeValue(principal, ATTRIBUTE_LAST_NAME);
+        user.setName(String.format("%s %s", givenName, surName));
+        user.setSource(SOURCE);
+        user.setStatus(principal.isActive() ? UserStatus.active : UserStatus.disabled);
+        user.setReadOnly(true);
+        try {
+            user.setRoles(getUsersRoles(principal.getName(), SOURCE));
+        } catch (UserNotFoundException e) {
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void setUsersRoles(String userId, String userSource, Set<RoleIdentifier> roleIdentifiers)
-            throws UserNotFoundException, InvalidConfigurationException {
-        super.setUsersRoles(userId, roleIdentifiers);
+        return user;
     }
 
 }
