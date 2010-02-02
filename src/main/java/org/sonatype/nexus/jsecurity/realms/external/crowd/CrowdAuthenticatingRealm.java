@@ -31,6 +31,8 @@ import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 
 import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
@@ -46,13 +48,15 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
     @Requirement
     private CrowdClientHolder crowdClientHolder;
 
+    private Logger logger = LoggerFactory.getLogger(CrowdAuthenticatingRealm.class);
+
     public static boolean isActive() {
         return active;
     }
 
     public void dispose() {
         active = false;
-        System.out.println("Crowd Realm deactivated...");
+        logger.info("Crowd Realm deactivated...");
     }
 
     @Override
@@ -61,7 +65,7 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
     }
 
     public void initialize() throws InitializationException {
-        System.out.println("Crowd Realm activated...");
+        logger.info("Crowd Realm activated...");
         active = true;
     }
 
