@@ -127,22 +127,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/nexus-plugin.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-component-metadata</artifactId>
                 <version>1.5.4</version>
@@ -215,12 +199,4 @@
     <properties>
         <nexus.version>1.5.0</nexus.version>
     </properties>
-
-    <!--
-        <profiles> <profile> <id>install-to-nexus</id> <build> <plugins> <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions>
-        <execution> <goals> <goal>run</goal> </goals> <phase>install</phase> <configuration> <tasks> <copy
-        tofile="${nexus.home}\nexus-webapp-${nexus.version}\runtime\apps\nexus\lib\nexus-crowd-plugin.jar"
-        file="target/nexus-crowd-plugin-${project.version}-jar-with-dependencies.jar" /> </tasks> </configuration> </execution>
-        </executions> </plugin> </plugins> </build> </profile> </profiles>
-    -->
 </project>
