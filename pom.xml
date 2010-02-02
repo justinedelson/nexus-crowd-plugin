@@ -195,6 +195,12 @@
             </plugin>
         </plugins>
     </reporting>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>forge-snapshots</id>
+            <url>http://repository.sonatype.org/content/repositories/nexus-plugins-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <nexus.version>1.5.0</nexus.version>
