@@ -11,7 +11,7 @@
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 /**
- * 
+ *
  */
 package org.sonatype.nexus.plugins.crowd.client;
 
@@ -26,9 +26,9 @@ import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
 /**
  * Interface that allows the various client components of the Crowd plugin to
  * access the Crowd client library.
- * 
+ *
  * @author Justin Edelson
- * 
+ *
  */
 public interface CrowdClientHolder {
     public SecurityServerClient getSecurityServerClient();
@@ -44,4 +44,6 @@ public interface CrowdClientHolder {
     public NexusRoleManager getNexusRoleManager();
 
     public Configuration getConfiguration();
+
+    public boolean isConfigured();
 }

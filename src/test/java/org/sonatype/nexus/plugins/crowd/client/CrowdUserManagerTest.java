@@ -43,6 +43,7 @@ public class CrowdUserManagerTest {
         userManager = createStrictMock(UserManager.class);
         nexusRoleManager = createStrictMock(NexusRoleManager.class);
         locator = new CrowdUserManager();
+        expect(holder.isConfigured()).andReturn(true).anyTimes();
         PrivateAccessor.setField(locator, "crowdClientHolder", holder);
     }
 

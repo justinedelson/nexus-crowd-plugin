@@ -24,6 +24,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 /**
  * @author justin
  *
@@ -44,7 +46,7 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
      * {@inheritDoc}
      */
     public Privilege getPrivilege(String privilegeId) throws NoSuchPrivilegeException {
-        return null;
+        throw new NoSuchPrivilegeException("Crowd plugin doesn't support privleges");
     }
 
     /**
@@ -103,23 +105,27 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
      * {@inheritDoc}
      */
     public Set<Privilege> listPrivileges() {
-        return null;
+        return Collections.emptySet();
     }
 
     /**
      * {@inheritDoc}
      */
     public Set<Role> listRoles() {
-        try {
-            return Sets.newHashSet(Iterables.transform(crowdClientHolder.getNexusRoleManager().getAllNexusRoles(),
-                    convertFromNameToRole));
-        } catch (RemoteException e) {
-            logger.error("Unable to load roles", e);
-            return null;
-        } catch (InvalidAuthorizationTokenException e) {
-            logger.error("Unable to load roles", e);
-            return null;
+        if (crowdClientHolder.isConfigured()) {
+            try {
+                return Sets.newHashSet(Iterables.transform(crowdClientHolder.getNexusRoleManager().getAllNexusRoles(),
+                        convertFromNameToRole));
+            } catch (RemoteException e) {
+                logger.error("Unable to load roles", e);
+                return null;
+            } catch (InvalidAuthorizationTokenException e) {
+                logger.error("Unable to load roles", e);
+                return null;
+            }
         }
+        UnconfiguredNotifier.unconfigured();
+        return Collections.emptySet();
     }
 
 }

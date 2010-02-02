@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;
@@ -129,17 +130,21 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
      * {@inheritDoc}
      */
     public User getUser(String userId) throws UserNotFoundException {
-        try {
-            SOAPPrincipal principal = crowdClientHolder.getUserManager().getUser(userId);
-            return convertToUser(principal);
-        } catch (RemoteException e) {
-            logger.error("Unable to look up user " + userId, e);
-            return null;
-        } catch (InvalidAuthorizationTokenException e) {
-            logger.error("Unable to look up user " + userId, e);
-            return null;
-        } catch (ObjectNotFoundException e) {
-            return null;
+        if (crowdClientHolder.isConfigured()) {
+            try {
+                SOAPPrincipal principal = crowdClientHolder.getUserManager().getUser(userId);
+                return convertToUser(principal);
+            } catch (RemoteException e) {
+                logger.error("Unable to look up user " + userId, e);
+                return null;
+            } catch (InvalidAuthorizationTokenException e) {
+                logger.error("Unable to look up user " + userId, e);
+                return null;
+            } catch (ObjectNotFoundException e) {
+                return null;
+            }
+        } else {
+            throw new UserNotFoundException("Crowd plugin is not configured.");
         }
     }
 
@@ -148,24 +153,28 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
      */
     public Set<RoleIdentifier> getUsersRoles(String userId, String userSource) throws UserNotFoundException {
         if (SOURCE.equals(userSource)) {
-            List<String> roleNames = null;
-            try {
-                roleNames = crowdClientHolder.getNexusRoleManager().getNexusRoles(userId);
-            } catch (RemoteException e) {
-                logger.error("Unable to look up user " + userId, e);
-                return Collections.emptySet();
-            } catch (InvalidAuthorizationTokenException e) {
-                logger.error("Unable to look up user " + userId, e);
-                return Collections.emptySet();
-            } catch (ObjectNotFoundException e) {
-                throw new UserNotFoundException(userId);
-            }
-            return Sets.newHashSet(Iterables.transform(roleNames, new Function<String, RoleIdentifier>() {
-
-                public RoleIdentifier apply(String from) {
-                    return new RoleIdentifier(SOURCE, from);
+            if (crowdClientHolder.isConfigured()) {
+                List<String> roleNames = null;
+                try {
+                    roleNames = crowdClientHolder.getNexusRoleManager().getNexusRoles(userId);
+                } catch (RemoteException e) {
+                    logger.error("Unable to look up user " + userId, e);
+                    return Collections.emptySet();
+                } catch (InvalidAuthorizationTokenException e) {
+                    logger.error("Unable to look up user " + userId, e);
+                    return Collections.emptySet();
+                } catch (ObjectNotFoundException e) {
+                    throw new UserNotFoundException(userId);
                 }
-            }));
+                return Sets.newHashSet(Iterables.transform(roleNames, new Function<String, RoleIdentifier>() {
+
+                    public RoleIdentifier apply(String from) {
+                        return new RoleIdentifier(SOURCE, from);
+                    }
+                }));
+            } else {
+                throw new UserNotFoundException("Crowd plugin is not configured.");
+            }
         } else {
             return Collections.emptySet();
         }
@@ -176,11 +185,16 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
      */
     @SuppressWarnings( { "unchecked", "deprecation" })
     public Set<String> listUserIds() {
-        try {
-            List<String> names = crowdClientHolder.getUserManager().getAllUserNames();
-            return new HashSet<String>(names);
-        } catch (Exception e) {
-            logger.error("Unable to get username list", e);
+        if (crowdClientHolder.isConfigured()) {
+            try {
+                List<String> names = crowdClientHolder.getUserManager().getAllUserNames();
+                return new HashSet<String>(names);
+            } catch (Exception e) {
+                logger.error("Unable to get username list", e);
+                return Collections.emptySet();
+            }
+        } else {
+            UnconfiguredNotifier.unconfigured();
             return Collections.emptySet();
         }
     }
@@ -209,6 +223,11 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
 
     @SuppressWarnings("unchecked")
     private Set<User> search(String userId, Set<String> roles, String email) {
+        if (!crowdClientHolder.isConfigured()) {
+            UnconfiguredNotifier.unconfigured();
+            return Collections.emptySet();
+        }
+
         List<SearchRestriction> searchRestrictions = new ArrayList<SearchRestriction>();
 
         searchRestrictions.add(new SearchRestriction(SearchContext.PRINCIPAL_ACTIVE, "true"));

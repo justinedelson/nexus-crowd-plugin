@@ -118,4 +118,11 @@ public class DefaultCrowdClientHolder extends AbstractLogEnabled implements Crow
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isConfigured() {
+        return configured;
+    }
+
 }
