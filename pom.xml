@@ -37,6 +37,12 @@
             <artifactId>nexus-rest-api</artifactId>
             <version>${nexus.version}</version>
             <scope>provided</scope>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>google-collect</artifactId>
+            		<groupId>com.google.code.google-collections</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
@@ -97,6 +103,11 @@
                     <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.google-collections</groupId>
+            <artifactId>google-collect</artifactId>
+            <version>snapshot-20080530</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
