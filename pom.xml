@@ -196,6 +196,10 @@
         </plugins>
     </reporting>
     <distributionManagement>
+        <repository>
+          <id>forge-releases</id>
+          <url>https://repository.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
         <snapshotRepository>
             <id>forge-snapshots</id>
             <url>http://repository.sonatype.org/content/repositories/nexus-plugins-snapshots</url>
