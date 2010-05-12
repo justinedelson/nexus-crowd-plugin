@@ -25,7 +25,7 @@
         <developer>
             <id>jedelson</id>
             <name>Justin Edelson</name>
-            <email>justin.edelson@mtvstaff.com</email>
+            <email>justin@justinedelson.com</email>
             <roles>
                 <role>developer</role>
             </roles>
@@ -94,8 +94,8 @@
                     <groupId>stax</groupId>
                 </exclusion>
                 <exclusion>
-                	<artifactId>commons-logging</artifactId>
-                	<groupId>commons-logging</groupId>
+               	    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
