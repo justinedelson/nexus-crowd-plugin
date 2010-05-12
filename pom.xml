@@ -17,8 +17,8 @@
 
     <scm>
         <url>http://github.com/justinedelson/nexus-crowd-plugin</url>
-        <connection>scm:git:git://github.com/justinedelson/nexus-crowd-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:justinedelson/nexus-crowd-plugin.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/justinedelson/nexus-crowd-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/justinedelson/nexus-crowd-plugin.git</developerConnection>
     </scm>
 
     <developers>
