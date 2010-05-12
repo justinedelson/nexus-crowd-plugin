@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;

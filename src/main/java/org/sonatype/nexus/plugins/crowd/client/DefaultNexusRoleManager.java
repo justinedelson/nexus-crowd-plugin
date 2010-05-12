@@ -43,6 +43,7 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         this.securityServerClient = securityServerClient;
     }
 
+    @SuppressWarnings({ "deprecation", "unchecked" })
     public List<String> getAllNexusRoles() throws RemoteException,
             InvalidAuthorizationTokenException {
         List<String> roles;
@@ -54,6 +55,7 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
         return roles;
     }
 
+    @SuppressWarnings({ "deprecation", "unchecked" })
     public List<String> getNexusRoles(String username) throws RemoteException,
             InvalidAuthorizationTokenException, ObjectNotFoundException {
         if (LOGGER.isDebugEnabled()) {

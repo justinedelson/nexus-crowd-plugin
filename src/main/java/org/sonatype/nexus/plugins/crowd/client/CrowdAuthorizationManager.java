@@ -30,7 +30,6 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
 import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
 import com.atlassian.crowd.integration.soap.SOAPEntity;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -85,7 +84,6 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
             role.setDescription(entity.getDescription());
             role.setSource(CrowdUserManager.SOURCE);
             role.setReadOnly(true);
-            role.setSessionTimeout(60); // no longer used
 
             return role;
         }
@@ -100,7 +98,6 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
             role.setDescription(name);
             role.setSource(CrowdUserManager.SOURCE);
             role.setReadOnly(true);
-            role.setSessionTimeout(60); // no longer used
 
             return role;
         }
@@ -116,6 +113,7 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public Set<Privilege> listPrivileges() {
         return Collections.emptySet();
     }
@@ -123,6 +121,7 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     public Set<Role> listRoles() {
         if (crowdClientHolder.isConfigured()) {
             try {
