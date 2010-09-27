@@ -38,10 +38,14 @@
             <version>${nexus.version}</version>
             <scope>provided</scope>
             <exclusions>
-            	<exclusion>
-            		<artifactId>google-collect</artifactId>
-            		<groupId>com.google.code.google-collections</groupId>
-            	</exclusion>
+                <exclusion>
+                    <artifactId>google-collect</artifactId>
+                    <groupId>com.google.code.google-collections</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>backport-util-concurrent</groupId>
+                    <artifactId>backport-util-concurrent</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -99,7 +103,7 @@
                     <groupId>stax</groupId>
                 </exclusion>
                 <exclusion>
-               	    <artifactId>commons-logging</artifactId>
+                    <artifactId>commons-logging</artifactId>
                     <groupId>commons-logging</groupId>
                 </exclusion>
             </exclusions>

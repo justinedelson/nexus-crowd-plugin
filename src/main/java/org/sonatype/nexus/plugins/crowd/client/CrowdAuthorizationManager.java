@@ -17,6 +17,7 @@ package org.sonatype.nexus.plugins.crowd.client;
 
 import java.rmi.RemoteException;
 import java.util.Set;
+import java.util.Collections;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -34,8 +35,6 @@ import com.atlassian.crowd.integration.soap.SOAPEntity;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * @author justin
