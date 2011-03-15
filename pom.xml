@@ -46,6 +46,10 @@
                     <groupId>backport-util-concurrent</groupId>
                     <artifactId>backport-util-concurrent</artifactId>
                 </exclusion>
+                <exclusion>
+                	<artifactId>commons-logging-api</artifactId>
+                	<groupId>commons-logging</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
