@@ -17,7 +17,7 @@ package org.sonatype.nexus.plugins.crowd.caching;
 
 import java.rmi.RemoteException;
 
-import com.atlassian.crowd.integration.authentication.PrincipalAuthenticationContext;
+import com.atlassian.crowd.integration.authentication.UserAuthenticationContext;
 import com.atlassian.crowd.integration.authentication.ValidationFactor;
 import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
 import com.atlassian.crowd.integration.exception.InactiveAccountException;
@@ -44,7 +44,7 @@ public class CachingAuthenticationManager extends AuthenticationManagerImpl {
         this.basicCache = basicCache;
     }
 
-    public String authenticate(PrincipalAuthenticationContext authenticationContext)
+    public String authenticate(UserAuthenticationContext authenticationContext)
             throws RemoteException, InvalidAuthorizationTokenException,
             InvalidAuthenticationException, InactiveAccountException,
             ApplicationAccessDeniedException {
