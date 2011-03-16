@@ -13,6 +13,8 @@
 package org.sonatype.nexus.jsecurity.realms.external.crowd;
 
 import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.List;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -20,9 +22,12 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -39,6 +44,7 @@ import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedExceptio
 import com.atlassian.crowd.integration.exception.InactiveAccountException;
 import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
 import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
 
 @Component(role = Realm.class, hint = "Crowd")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initializable, Disposable {
@@ -101,7 +107,17 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        return null;
+        String username = (String)principals.getPrimaryPrincipal();
+        try {
+			List<String> roles = crowdClientHolder.getNexusRoleManager().getNexusRoles(username);
+			return new SimpleAuthorizationInfo(new HashSet<String>(roles));
+		} catch (RemoteException e) {
+			throw new AuthorizationException("Could not retrieve info from Crowd.", e);
+		} catch (InvalidAuthorizationTokenException e) {
+			throw new AuthorizationException("Could not retrieve info from Crowd.", e);
+		} catch (ObjectNotFoundException e) {
+			throw new UnknownAccountException("User " + username + " not found", e);
+		}
     }
 
 }
