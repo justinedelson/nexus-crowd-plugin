@@ -27,7 +27,8 @@ import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
 
 /**
  * Intent of this class is to enable an admin to easily test if the Crowd
@@ -66,9 +67,12 @@ public class CrowdTestPlexusResource extends AbstractPlexusResource {
         } catch (RemoteException e) {
             throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
                     "Unable to authenticate. Check configuration.", e);
-        } catch (InvalidAuthorizationTokenException e) {
+        } catch (InvalidAuthenticationException e) {
             throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
                     "Unable to authenticate. Check configuration.", e);
-        }
+		} catch (InvalidAuthorizationTokenException e) {
+            throw new ResourceException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
+                    "Unable to authenticate. Check configuration.", e);
+		}
     }
 }

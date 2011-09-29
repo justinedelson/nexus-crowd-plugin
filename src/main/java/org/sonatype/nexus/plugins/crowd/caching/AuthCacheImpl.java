@@ -19,7 +19,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-import com.atlassian.crowd.integration.service.cache.CacheImpl;
+import com.atlassian.crowd.service.cache.CacheImpl;
 
 /**
  * Extension of Crowd CacheImpl object which supports caching of authentication

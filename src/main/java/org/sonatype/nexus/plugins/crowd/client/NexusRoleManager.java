@@ -15,8 +15,10 @@ package org.sonatype.nexus.plugins.crowd.client;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
+import com.atlassian.crowd.exception.GroupNotFoundException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.crowd.integration.soap.SOAPEntity;
 
 /**
@@ -27,12 +29,10 @@ import com.atlassian.crowd.integration.soap.SOAPEntity;
  */
 public interface NexusRoleManager {
 
-    List<String> getNexusRoles(String username) throws RemoteException, InvalidAuthorizationTokenException,
-            ObjectNotFoundException;
+    List<String> getNexusRoles(String username) throws UserNotFoundException, RemoteException, InvalidAuthenticationException, InvalidAuthorizationTokenException;
 
-    SOAPEntity getNexusRole(String roleName) throws ObjectNotFoundException, InvalidAuthorizationTokenException,
-            RemoteException;
+    SOAPEntity getNexusRole(String roleName) throws GroupNotFoundException, RemoteException, InvalidAuthenticationException, InvalidAuthorizationTokenException;
 
-    List<String> getAllNexusRoles() throws RemoteException, InvalidAuthorizationTokenException;
+    List<String> getAllNexusRoles() throws RemoteException, InvalidAuthenticationException, InvalidAuthorizationTokenException;
 
 }

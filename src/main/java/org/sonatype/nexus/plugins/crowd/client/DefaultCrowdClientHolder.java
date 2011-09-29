@@ -27,17 +27,17 @@ import org.sonatype.nexus.plugins.crowd.config.CrowdPluginConfiguration;
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 
-import com.atlassian.crowd.integration.service.AuthenticationManager;
-import com.atlassian.crowd.integration.service.GroupManager;
-import com.atlassian.crowd.integration.service.GroupMembershipManager;
-import com.atlassian.crowd.integration.service.UserManager;
-import com.atlassian.crowd.integration.service.cache.CachingGroupManager;
-import com.atlassian.crowd.integration.service.cache.CachingGroupMembershipManager;
-import com.atlassian.crowd.integration.service.cache.CachingUserManager;
-import com.atlassian.crowd.integration.service.soap.client.ClientProperties;
-import com.atlassian.crowd.integration.service.soap.client.ClientPropertiesImpl;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClientImpl;
+import com.atlassian.crowd.service.AuthenticationManager;
+import com.atlassian.crowd.service.GroupManager;
+import com.atlassian.crowd.service.GroupMembershipManager;
+import com.atlassian.crowd.service.UserManager;
+import com.atlassian.crowd.service.cache.CachingGroupManager;
+import com.atlassian.crowd.service.cache.CachingGroupMembershipManager;
+import com.atlassian.crowd.service.cache.CachingUserManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.service.soap.client.SecurityServerClientImpl;
+import com.atlassian.crowd.service.soap.client.SoapClientProperties;
+import com.atlassian.crowd.service.soap.client.SoapClientPropertiesImpl;
 
 /**
  * Implementation of the CrowdClientHolder which uses caching wherever possible.
@@ -104,7 +104,7 @@ public class DefaultCrowdClientHolder extends AbstractLogEnabled implements Crow
         basicCache = new AuthCacheImpl(cacheManager.getEhCacheManager());
         configuration = crowdPluginConfiguration.getConfiguration();
         if (configuration != null) {
-            ClientProperties clientProps = new ClientPropertiesImpl(configuration.getCrowdClientProperties());
+        	SoapClientProperties clientProps = SoapClientPropertiesImpl.newInstanceFromProperties(configuration.getCrowdClientProperties());
             securityServerClient = new SecurityServerClientImpl(clientProps);
             userManager = new CachingUserManager(securityServerClient, basicCache);
             groupManager = new CachingGroupManager(securityServerClient, basicCache);

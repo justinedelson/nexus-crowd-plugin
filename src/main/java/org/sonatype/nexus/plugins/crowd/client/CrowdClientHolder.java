@@ -17,11 +17,11 @@ package org.sonatype.nexus.plugins.crowd.client;
 
 import org.sonatype.nexus.plugins.crowd.config.model.v1_0_0.Configuration;
 
-import com.atlassian.crowd.integration.service.AuthenticationManager;
-import com.atlassian.crowd.integration.service.GroupManager;
-import com.atlassian.crowd.integration.service.GroupMembershipManager;
-import com.atlassian.crowd.integration.service.UserManager;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.service.AuthenticationManager;
+import com.atlassian.crowd.service.GroupManager;
+import com.atlassian.crowd.service.GroupMembershipManager;
+import com.atlassian.crowd.service.UserManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
 
 /**
  * Interface that allows the various client components of the Crowd plugin to

@@ -40,11 +40,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 
-import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
-import com.atlassian.crowd.integration.exception.InactiveAccountException;
-import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
+import com.atlassian.crowd.exception.ApplicationAccessDeniedException;
+import com.atlassian.crowd.exception.ExpiredCredentialException;
+import com.atlassian.crowd.exception.InactiveAccountException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 
 @Component(role = Realm.class, hint = "Crowd")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initializable, Disposable {
@@ -94,15 +95,17 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
                     getName());
         } catch (RemoteException e) {
             throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthorizationTokenException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (ApplicationAccessDeniedException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthenticationException e) {
-            throw new IncorrectCredentialsException(e);
         } catch (InactiveAccountException e) {
-            throw new DisabledAccountException(e);
-        }
+        	throw new DisabledAccountException(e);
+		} catch (ExpiredCredentialException e) {
+			throw new IncorrectCredentialsException(e);
+		} catch (InvalidAuthenticationException e) {
+			throw new IncorrectCredentialsException(e);
+		} catch (InvalidAuthorizationTokenException e) {
+			throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+		} catch (ApplicationAccessDeniedException e) {
+			throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+		}
     }
 
     @Override
@@ -113,10 +116,12 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
 			return new SimpleAuthorizationInfo(new HashSet<String>(roles));
 		} catch (RemoteException e) {
 			throw new AuthorizationException("Could not retrieve info from Crowd.", e);
+		} catch (UserNotFoundException e) {
+			throw new UnknownAccountException("User " + username + " not found", e);
+		} catch (InvalidAuthenticationException e) {
+			throw new IncorrectCredentialsException(e);
 		} catch (InvalidAuthorizationTokenException e) {
 			throw new AuthorizationException("Could not retrieve info from Crowd.", e);
-		} catch (ObjectNotFoundException e) {
-			throw new UnknownAccountException("User " + username + " not found", e);
 		}
     }
 

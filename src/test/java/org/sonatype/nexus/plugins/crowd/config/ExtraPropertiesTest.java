@@ -28,7 +28,7 @@ public class ExtraPropertiesTest {
 
         Configuration configuration = reader.read(getClass().getResourceAsStream("/extra-props.xml"));
 
-        List props = configuration.getExtraCrowdProperties();
+        List<?> props = configuration.getExtraCrowdProperties();
         Assert.assertEquals(1, props.size());
 
         Property prop = (Property) props.get(0);
