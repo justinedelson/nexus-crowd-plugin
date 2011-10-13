@@ -246,4 +246,34 @@
     <properties>
         <nexus.version>1.9.2.3</nexus.version>
     </properties>
+
+	<repositories>
+		<repository>
+			<id>rso</id>
+			<name>repository.sonatype.org</name>
+			<url>https://repository.sonatype.org/content/groups/forge/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+		  <id>atlassian</id>
+		  <name>maven.atlassian.com</name>
+		  <url>https://maven.atlassian.com/content/groups/public/</url>
+		  <releases>
+		     <enabled>true</enabled>
+		  </releases>
+		</repository>
+	</repositories>
+	
+	<pluginRepositories>
+	   <pluginRepository>
+	   <id>rso-plugins</id>
+			<name>repository.sonatype.org plugins</name>
+			<url>https://repository.sonatype.org/content/groups/forge/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+	   </pluginRepository>
+	</pluginRepositories>
 </project>
