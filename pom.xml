@@ -27,7 +27,22 @@
             <email>justin@justinedelson.com</email>
             <roles>
                 <role>developer</role>
-            </roles>
+            </roles>            
+        </developer>
+        <developer>
+            <id>rkrzewski</id>
+            <name>Rafał Krzewski</name>
+            <email>rafal.krzewski@objectledge.org</email>
+            <roles>
+                <role>developer</role>
+            </roles>            
+        </developer>
+        <developer>
+            <id>hypobyte</id>
+            <name>Trygve Sanne Hardersen</name>
+            <roles>
+                <role>developer</role>
+            </roles>            
         </developer>
     </developers>
 
