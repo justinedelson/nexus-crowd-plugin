@@ -16,8 +16,8 @@
 package org.sonatype.nexus.plugins.crowd.client;
 
 import java.rmi.RemoteException;
-import java.util.Set;
 import java.util.Collections;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -30,7 +30,8 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
 import com.atlassian.crowd.integration.soap.SOAPEntity;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -112,7 +113,6 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public Set<Privilege> listPrivileges() {
         return Collections.emptySet();
     }
@@ -120,7 +120,6 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public Set<Role> listRoles() {
         if (crowdClientHolder.isConfigured()) {
             try {
@@ -129,10 +128,13 @@ public class CrowdAuthorizationManager extends AbstractReadOnlyAuthorizationMana
             } catch (RemoteException e) {
                 logger.error("Unable to load roles", e);
                 return null;
-            } catch (InvalidAuthorizationTokenException e) {
+            } catch (InvalidAuthenticationException e) {
                 logger.error("Unable to load roles", e);
                 return null;
-            }
+			} catch (InvalidAuthorizationTokenException e) {
+                logger.error("Unable to load roles", e);
+                return null;
+			}
         }
         UnconfiguredNotifier.unconfigured();
         return Collections.emptySet();

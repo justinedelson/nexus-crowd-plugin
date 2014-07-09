@@ -19,12 +19,14 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
-import com.atlassian.crowd.integration.service.GroupManager;
-import com.atlassian.crowd.integration.service.GroupMembershipManager;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.exception.GroupNotFoundException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.crowd.integration.soap.SOAPEntity;
+import com.atlassian.crowd.service.GroupManager;
+import com.atlassian.crowd.service.GroupMembershipManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
 
 public class DefaultNexusRoleManager implements NexusRoleManager {
 
@@ -44,8 +46,7 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
     }
 
     @SuppressWarnings({ "deprecation", "unchecked" })
-    public List<String> getAllNexusRoles() throws RemoteException,
-            InvalidAuthorizationTokenException {
+    public List<String> getAllNexusRoles() throws RemoteException, InvalidAuthenticationException, InvalidAuthorizationTokenException {
         List<String> roles;
         if (useGroups) {
             roles = groupManager.getAllGroupNames();
@@ -56,8 +57,7 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
     }
 
     @SuppressWarnings({ "deprecation", "unchecked" })
-    public List<String> getNexusRoles(String username) throws RemoteException,
-            InvalidAuthorizationTokenException, ObjectNotFoundException {
+    public List<String> getNexusRoles(String username) throws UserNotFoundException, RemoteException, InvalidAuthenticationException, InvalidAuthorizationTokenException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Looking up role list for username: " + username);
         }
@@ -77,8 +77,12 @@ public class DefaultNexusRoleManager implements NexusRoleManager {
 
     /**
      * {@inheritDoc}
+     * @throws InvalidAuthorizationTokenException 
+     * @throws InvalidAuthenticationException 
+     * @throws RemoteException 
+     * @throws GroupNotFoundException 
      */
-    public SOAPEntity getNexusRole(String roleName) throws RemoteException, InvalidAuthorizationTokenException, ObjectNotFoundException {
+    public SOAPEntity getNexusRole(String roleName) throws GroupNotFoundException, RemoteException, InvalidAuthenticationException, InvalidAuthorizationTokenException {
         if (useGroups) {
             return groupManager.getGroup(roleName);
         } else {

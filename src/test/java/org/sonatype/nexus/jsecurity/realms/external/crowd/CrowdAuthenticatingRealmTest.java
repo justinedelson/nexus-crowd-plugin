@@ -12,7 +12,8 @@
  */
 package org.sonatype.nexus.jsecurity.realms.external.crowd;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,9 +31,9 @@ public class CrowdAuthenticatingRealmTest {
 
     @Test
     public void checkActiveFlag() throws Exception {
-        assertFalse(realm.isActive());
+        assertFalse(CrowdAuthenticatingRealm.isActive());
         realm.initialize();
-        assertTrue(realm.isActive());
+        assertTrue(CrowdAuthenticatingRealm.isActive());
     }
 
     @After

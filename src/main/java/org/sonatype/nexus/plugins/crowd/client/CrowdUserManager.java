@@ -41,13 +41,13 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
-import com.atlassian.crowd.integration.SearchContext;
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.exception.ObjectNotFoundException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
 import com.atlassian.crowd.integration.soap.SOAPAttribute;
 import com.atlassian.crowd.integration.soap.SOAPEntity;
 import com.atlassian.crowd.integration.soap.SOAPPrincipal;
 import com.atlassian.crowd.integration.soap.SearchRestriction;
+import com.atlassian.crowd.search.SearchContext;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -148,14 +148,17 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
             } catch (RemoteException e) {
                 logger.error("Unable to look up user " + userId, e);
                 return null;
-            } catch (InvalidAuthorizationTokenException e) {
+            } catch (InvalidAuthenticationException e) {
                 logger.error("Unable to look up user " + userId, e);
                 return null;
-            } catch (ObjectNotFoundException e) {
+            } catch (com.atlassian.crowd.exception.UserNotFoundException e) {
+                throw new UserNotFoundException(userId);
+			} catch (InvalidAuthorizationTokenException e) {
+                logger.error("Unable to look up user " + userId, e);
                 return null;
-            }
+			}
         } else {
-            throw new UserNotFoundException("Crowd plugin is not configured.");
+            throw new UserNotFoundException(userId, "Crowd plugin is not configured.");
         }
     }
 
@@ -171,12 +174,14 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
                 } catch (RemoteException e) {
                     logger.error("Unable to look up user " + userId, e);
                     return Collections.emptySet();
-                } catch (InvalidAuthorizationTokenException e) {
+                } catch (com.atlassian.crowd.exception.UserNotFoundException e) {
+                	throw new UserNotFoundException(userId);
+				} catch (InvalidAuthenticationException e) {
+					throw new UserNotFoundException(userId);
+				} catch (InvalidAuthorizationTokenException e) {
                     logger.error("Unable to look up user " + userId, e);
                     return Collections.emptySet();
-                } catch (ObjectNotFoundException e) {
-                    throw new UserNotFoundException(userId);
-                }
+				}
                 return Sets.newHashSet(Iterables.transform(roleNames, new Function<String, RoleIdentifier>() {
 
                     public RoleIdentifier apply(String from) {
@@ -283,10 +288,10 @@ public class CrowdUserManager extends AbstractReadOnlyUserManager implements Use
         }
         String givenName = getAttributeValue(principal, ATTRIBUTE_FIRST_NAME);
         String surName = getAttributeValue(principal, ATTRIBUTE_LAST_NAME);
-        user.setName(String.format("%s %s", givenName, surName));
+        user.setFirstName(givenName);
+        user.setLastName(surName);
         user.setSource(SOURCE);
         user.setStatus(principal.isActive() ? UserStatus.active : UserStatus.disabled);
-        user.setReadOnly(true);
         try {
             user.setRoles(getUsersRoles(principal.getName(), SOURCE));
         } catch (UserNotFoundException e) {

@@ -13,32 +13,39 @@
 package org.sonatype.nexus.jsecurity.realms.external.crowd;
 
 import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.List;
 
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.DisabledAccountException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.DisabledAccountException;
-import org.jsecurity.authc.IncorrectCredentialsException;
-import org.jsecurity.authc.SimpleAuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authc.pam.UnsupportedTokenException;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.crowd.client.CrowdClientHolder;
 
-import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
-import com.atlassian.crowd.integration.exception.InactiveAccountException;
-import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.ApplicationAccessDeniedException;
+import com.atlassian.crowd.exception.ExpiredCredentialException;
+import com.atlassian.crowd.exception.InactiveAccountException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 
 @Component(role = Realm.class, hint = "Crowd")
 public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initializable, Disposable {
@@ -88,20 +95,34 @@ public class CrowdAuthenticatingRealm extends AuthorizingRealm implements Initia
                     getName());
         } catch (RemoteException e) {
             throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthorizationTokenException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (ApplicationAccessDeniedException e) {
-            throw new AuthenticationException("Could not retrieve info from Crowd.", e);
-        } catch (InvalidAuthenticationException e) {
-            throw new IncorrectCredentialsException(e);
         } catch (InactiveAccountException e) {
-            throw new DisabledAccountException(e);
-        }
+        	throw new DisabledAccountException(e);
+		} catch (ExpiredCredentialException e) {
+			throw new IncorrectCredentialsException(e);
+		} catch (InvalidAuthenticationException e) {
+			throw new IncorrectCredentialsException(e);
+		} catch (InvalidAuthorizationTokenException e) {
+			throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+		} catch (ApplicationAccessDeniedException e) {
+			throw new AuthenticationException("Could not retrieve info from Crowd.", e);
+		}
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        return null;
+        String username = (String)principals.getPrimaryPrincipal();
+        try {
+			List<String> roles = crowdClientHolder.getNexusRoleManager().getNexusRoles(username);
+			return new SimpleAuthorizationInfo(new HashSet<String>(roles));
+		} catch (RemoteException e) {
+			throw new AuthorizationException("Could not retrieve info from Crowd.", e);
+		} catch (UserNotFoundException e) {
+			throw new UnknownAccountException("User " + username + " not found", e);
+		} catch (InvalidAuthenticationException e) {
+			throw new IncorrectCredentialsException(e);
+		} catch (InvalidAuthorizationTokenException e) {
+			throw new AuthorizationException("Could not retrieve info from Crowd.", e);
+		}
     }
 
 }

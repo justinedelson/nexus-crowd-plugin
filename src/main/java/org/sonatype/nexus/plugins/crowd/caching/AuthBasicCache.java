@@ -15,7 +15,7 @@
  */
 package org.sonatype.nexus.plugins.crowd.caching;
 
-import com.atlassian.crowd.integration.service.cache.BasicCache;
+import com.atlassian.crowd.service.cache.BasicCache;
 
 /**
  * Extension of Crowd's BasicCache interface to enable authentication caching.

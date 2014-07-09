@@ -17,15 +17,16 @@ package org.sonatype.nexus.plugins.crowd.caching;
 
 import java.rmi.RemoteException;
 
-import com.atlassian.crowd.integration.authentication.PrincipalAuthenticationContext;
-import com.atlassian.crowd.integration.authentication.ValidationFactor;
-import com.atlassian.crowd.integration.exception.ApplicationAccessDeniedException;
-import com.atlassian.crowd.integration.exception.InactiveAccountException;
-import com.atlassian.crowd.integration.exception.InvalidAuthenticationException;
-import com.atlassian.crowd.integration.exception.InvalidAuthorizationTokenException;
-import com.atlassian.crowd.integration.service.cache.AuthenticationManagerImpl;
-import com.atlassian.crowd.integration.service.soap.client.SecurityServerClient;
-import com.atlassian.crowd.integration.util.Assert;
+import com.atlassian.crowd.exception.ApplicationAccessDeniedException;
+import com.atlassian.crowd.exception.ExpiredCredentialException;
+import com.atlassian.crowd.exception.InactiveAccountException;
+import com.atlassian.crowd.exception.InvalidAuthenticationException;
+import com.atlassian.crowd.exception.InvalidAuthorizationTokenException;
+import com.atlassian.crowd.model.authentication.UserAuthenticationContext;
+import com.atlassian.crowd.model.authentication.ValidationFactor;
+import com.atlassian.crowd.service.cache.SimpleAuthenticationManager;
+import com.atlassian.crowd.service.soap.client.SecurityServerClient;
+import com.atlassian.crowd.util.Assert;
 
 /**
  * Implementation of Crowd client's AuthenticationManager which caches tokens
@@ -34,7 +35,7 @@ import com.atlassian.crowd.integration.util.Assert;
  * @author Justin Edelson
  * 
  */
-public class CachingAuthenticationManager extends AuthenticationManagerImpl {
+public class CachingAuthenticationManager extends SimpleAuthenticationManager {
 
     private AuthBasicCache basicCache;
 
@@ -43,17 +44,18 @@ public class CachingAuthenticationManager extends AuthenticationManagerImpl {
         super(securityServerClient);
         this.basicCache = basicCache;
     }
+    
+	public String authenticate(UserAuthenticationContext authenticationContext)
+			throws RemoteException, InvalidAuthorizationTokenException,
+			InvalidAuthenticationException, InactiveAccountException,
+			ApplicationAccessDeniedException, ExpiredCredentialException {
+		return super.authenticate(authenticationContext);
+	}
 
-    public String authenticate(PrincipalAuthenticationContext authenticationContext)
-            throws RemoteException, InvalidAuthorizationTokenException,
-            InvalidAuthenticationException, InactiveAccountException,
-            ApplicationAccessDeniedException {
-        return super.authenticate(authenticationContext);
-    }
-
-    public String authenticate(String username, String password) throws RemoteException,
-            InvalidAuthorizationTokenException, InvalidAuthenticationException,
-            InactiveAccountException, ApplicationAccessDeniedException {
+	public String authenticate(String username, String password)
+			throws RemoteException, InvalidAuthorizationTokenException,
+			InvalidAuthenticationException, InactiveAccountException,
+			ApplicationAccessDeniedException, ExpiredCredentialException {
         Assert.notNull(username);
         Assert.notNull(password);
 
@@ -63,17 +65,17 @@ public class CachingAuthenticationManager extends AuthenticationManagerImpl {
             basicCache.addOrReplaceToken(username, password, token);
         }
         return token;
-    }
+	}
 
-    public void invalidate(String token) throws RemoteException, InvalidAuthorizationTokenException {
-        super.invalidate(token);
+	public void invalidate(String token) throws RemoteException,
+			InvalidAuthorizationTokenException, InvalidAuthenticationException {
+		super.invalidate(token);
+	}
 
-    }
-
-    public boolean isAuthenticated(String token, ValidationFactor[] validationFactors)
-            throws RemoteException, InvalidAuthorizationTokenException,
-            ApplicationAccessDeniedException {
-        return super.isAuthenticated(token, validationFactors);
-    }
-
+	public boolean isAuthenticated(String token,
+			ValidationFactor[] validationFactors) throws RemoteException,
+			InvalidAuthorizationTokenException,
+			ApplicationAccessDeniedException, InvalidAuthenticationException {
+		return super.isAuthenticated(token, validationFactors);
+	}
 }
